@@ -1,2 +1,2 @@
 # banquet
-Framework leggero e veloce per lo sviluppo di Applicazioni Web e API REST in PHP
+**Banquet** è un framework PHP leggero per applicazioni Web e API REST, pensato per essere essenziale, senza dipendenze esterne e con una curva di apprendimento minima.
