@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentazione Framework Banquet</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #8b5cf6;
+      --border: #334155;
+      --code-bg: #020617;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg), #111827 60%, #1e293b);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    a { color: var(--accent); }
+    code, pre {
+      font-family: Consolas, Monaco, monospace;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .hero {
+      background: rgba(17,24,39,0.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.28);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+    }
+
+    .hero p { color: var(--muted); margin: 0; }
+
+    nav {
+      background: rgba(17,24,39,0.85);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      margin-bottom: 24px;
+    }
+
+    nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    section {
+      background: rgba(17,24,39,0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    }
+
+    h2, h3, h4 {
+      margin-top: 0;
+      color: #f8fafc;
+    }
+
+    ul, ol { padding-left: 20px; }
+    li { margin-bottom: 6px; }
+
+    pre {
+      background: var(--code-bg);
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+    }
+
+    code {
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: #f8fafc;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .muted { color: var(--muted); }
+
+    @media (max-width: 720px) {
+      .hero h1 { font-size: 1.6rem; }
+      nav { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>Documentazione Framework Banquet</h1>
+      <p>Framework PHP leggero per applicazioni web, API REST e generazione automatica di componenti.</p>
+    </div>
+
+    <nav>
+      <ul>
+        <li><a href="#struttura">Struttura</a></li>
+        <li><a href="#request">Entry point</a></li>
+        <li><a href="#routing">Routing</a></li>
+        <li><a href="#actions">Actions</a></li>
+        <li><a href="#factory">Factory</a></li>
+        <li><a href="#middleware">Middleware</a></li>
+        <li><a href="#generator">Generatore</a></li>
+      </ul>
+    </nav>
+
+    <section id="struttura">
+      <h2>1. Struttura delle directory</h2>
+      <pre>banquet/
+├── index.php
+├── composer.json
+├── app/
+│   ├── log.txt
+│   ├── brand/
+│   ├── setting/
+│   │   ├── config.php
+│   │   ├── startup.php
+│   │   └── prop/
+│   └── src/
+│       ├── Core/
+│       ├── Actions/
+│       ├── Service/
+│       ├── Model/
+│       ├── Dao/
+│       ├── Entity/
+│       ├── Driver/
+│       ├── routes/
+│       └── view/
+└── generator/
+    └── generate.php</pre>
+    </section>
+
+    <section id="request">
+      <h2>2. Entry point e flusso di richiesta</h2>
+      <p>Il front controller è <code>index.php</code>. Esegue il caricamento di Composer, crea il container, imposta la response e invoca <code>Factory::output(Action::getAction())</code>.</p>
+      <ol>
+        <li><code>Action::getAction()</code> carica il file delle route.</li>
+        <li>Il router valuta l'URI e restituisce la classe Action.</li>
+        <li><code>Factory::output()</code> risolve l'Action dal container.</li>
+        <li>L'Action esegue <code>send()</code>.</li>
+        <li>Il template viene renderizzato e inviato al browser.</li>
+      </ol>
+
+      <h3>Quickstart</h3>
+      <pre>php generator/generate.php
+php generator/generate.php --table=corsi
+php generator/generate.php --action=Corsi --with-view --with-route
+php generator/generate.php --action=Corsi --with-api
+php generator/generate.php --class-dao</pre>
+    </section>
+
+    <section id="routing">
+      <h2>3. Routing</h2>
+      <p>Il router supporta GET, POST, PUT, DELETE e usa pattern come <code>{id}</code>, <code>{id:\d+}</code> e <code>{slug}-{id}</code>.</p>
+      <pre>$router = new \Banquet\Core\Router();
+
+$router->get('/', \Banquet\Actions\Home::class);
+$router->get('/home', \Banquet\Actions\Home::class);
+$router->get('/doc/{tipo}/{id}', \Banquet\Actions\Doc::class);
+$router->get('/rest', \Banquet\Actions\Rest::class);
+$router->get('/rest/{id}', \Banquet\Actions\Rest::class);
+$router->get('/login', \Banquet\Actions\Login::class);
+$router->post('/login', \Banquet\Actions\Login::class);
+
+return $router;</pre>
+    </section>
+
+    <section id="actions">
+      <h2>4. Actions (Controller)</h2>
+      <p>Le Action estendono <code>Banquet\Core\SenderAction</code> e implementano <code>send()</code>.</p>
+      <pre>&lt;?php
+namespace Banquet\Actions;
+
+use Banquet\Core\SenderAction;
+
+class MiaAction extends SenderAction
+{
+    public function send()
+    {
+        $this->setTemplateName('pages/mia-pagina');
+        $this->varAdd('titolo', 'Mia pagina');
+        return $this->getTemplate('default');
+    }
+}</pre>
+      <div class="grid">
+        <div class="card">
+          <h3>Metodi utili</h3>
+          <ul>
+            <li><code>setTemplateName()</code></li>
+            <li><code>setTemplateChildren()</code></li>
+            <li><code>varAdd()</code></li>
+            <li><code>route()</code></li>
+            <li><code>logInfo()</code> / <code>logError()</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Children</h3>
+          <p>I children sono Action secondarie che vengono incluse nel master template e resi disponibili come variabili.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="factory">
+      <h2>5. Factory e rendering</h2>
+      <p><code>Banquet\Core\Factory</code> risolve le Action, esegue il rendering dei template e invia l'output tramite la response.</p>
+      <ul>
+        <li><code>Factory::output($actionClass)</code> risolve l'Action.</li>
+        <li><code>Factory::getOutput()</code> chiama <code>send()</code>.</li>
+        <li><code>Factory::getTemplate()</code> carica i template.</li>
+      </ul>
+    </section>
+
+    <section id="middleware">
+      <h2>6. Middleware</h2>
+      <p>Il router supporta middleware come <code>auth</code> e <code>guest</code>.</p>
+      <pre>$router->get('/rest/{id}/{code}', \Banquet\Actions\Rest::class)->middleware('auth');
+$router->get('/login', \Banquet\Actions\Login::class)->middleware('guest');</pre>
+      <p class="muted">Il comportamento attuale reindirizza a /login o / in base al contesto di sessione.</p>
+    </section>
+
+    <section id="generator">
+      <h2>7. Generatore automatico</h2>
+      <p>Lo script <code>generator/generate.php</code> crea classi e file base per Entity, DAO, Model, Service, Action, View e API REST.</p>
+      <h3>Opzioni principali</h3>
+      <ul>
+        <li><code>--dsn</code></li>
+        <li><code>--user</code></li>
+        <li><code>--pass</code></li>
+        <li><code>--table</code></li>
+        <li><code>--prefix</code></li>
+        <li><code>--action</code></li>
+        <li><code>--with-view</code></li>
+        <li><code>--with-route</code></li>
+        <li><code>--with-api</code></li>
+        <li><code>--class-dao</code></li>
+      </ul>
+      <h3>Esempi</h3>
+      <pre>php generator/generate.php
+php generator/generate.php --table=corsi
+php generator/generate.php --action=Corsi --with-view --with-route
+php generator/generate.php --action=Corsi --with-api</pre>
+    </section>
+  </div>
+</body>
+</html>
