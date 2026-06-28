@@ -5,7 +5,7 @@
 <h1 align="center">Banquet</h1>
 
 <p align="center">
-  <strong>Banquet è un tool PHP per lo sviluppo rapido di applicazioni web e API REST, basato su generazione automatica del codice a partire dal database.</strong>
+  <strong>Banquet è un mini Framawork Development Tool PHP per lo sviluppo rapido di applicazioni Web e API REST, basato su generazione automatica del codice a partire dal database.</strong>
   <br>
   MVC · Front Controller · DI Container · Composite View · Routing avanzato · Generatore automatico di classi
   <br><br>
