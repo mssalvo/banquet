@@ -1,0 +1,1 @@
+<?php echo isset($error) ? $error : json_encode(['esito'=>'error','message'=>"errore generico"]); 
