@@ -31,8 +31,8 @@
 
 ---
 
-👉 [Guida rapida](https://github.com/mssalvo/banquet/blob/master/docs/guida-rapida.md)
-👉 [Documentazione](https://github.com/mssalvo/banquet/blob/master/docs/documentazione.md)
+👉 [Guida rapida](https://github.com/mssalvo/banquet/blob/main/docs/guida-rapida.md)
+👉 [Documentazione](https://github.com/mssalvo/banquet/blob/main/docs/documentazione.md)
 
 ---
 
