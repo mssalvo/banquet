@@ -114,6 +114,13 @@ php -S localhost:8000
 | **Flessibile** | Supporta MySQL, PostgreSQL, SQLite e SQL Server con un unico driver PDO. |
 
 ---
+🔐 Sicurezza
+
+- password_hash / password_verify
+- CSRF protection
+- sanitizzazione output
+
+---
 
 👉 [Guida rapida](https://github.com/mssalvo/banquet/blob/main/docs/guida-rapida.md)
 👉 [Documentazione](https://github.com/mssalvo/banquet/blob/main/docs/documentazione.md)
