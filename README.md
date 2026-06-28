@@ -31,6 +31,11 @@
 
 ---
 
+👉 [Guida rapida](https://github.com/mssalvo/banquet/blob/master/docs/guida-rapida.md)
+👉 [Documentazione](https://github.com/mssalvo/banquet/blob/master/docs/documentazione.md)
+
+---
+
 ## Inizio Rapido
 
 ```bash
