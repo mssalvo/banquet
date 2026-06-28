@@ -71,12 +71,37 @@ A partire da una tabella database:
 ```sql
 corsi (id, nome, descrizione)
 ```
+ 
+#### php generator/generate.php --table=corsi --with-api
+ 
+
+Banquet genera automaticamente:
+
+- ✅ CorsoEntity
+- ✅ CorsoDao
+- ✅ CorsoModel
+- ✅ CorsoService
+- ✅ Endpoint REST
+- ✅ Route
+- ✅ View (opzionale)
+
+
+
+
+🌐 Esempio API
+Dopo generazione:
+- GET    /corsi
+- GET    /corsi/{id}
+- POST   /corsi
+- PUT    /corsi
+- DELETE /corsi/{id}
+
+▶️ Avvio
 ```shell
-cmd: php generator/generate.php --table=corsi --with-api
+php -S localhost:8000
 ```
-
+  
 ---
-
 
 ## Perché Banquet?
 
