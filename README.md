@@ -5,7 +5,7 @@
 <h1 align="center">Banquet</h1>
 
 <p align="center">
-  <strong>PHP Framework leggero per applicazioni Web e API REST</strong>
+  <strong>Banquet è un tool PHP per lo sviluppo rapido di applicazioni web e API REST, basato su generazione automatica del codice a partire dal database.</strong>
   <br>
   MVC · Front Controller · DI Container · Composite View · Routing avanzato · Generatore automatico di classi
   <br><br>
@@ -18,6 +18,65 @@
 </p>
 
 ---
+
+## 🚀 Cos'è Banquet
+
+Banquet è un micro-framework + code generator che permette di creare rapidamente:
+
+- Entity
+- DAO
+- Model
+- Service
+- API REST
+- View (opzionale)
+- Routing automatico
+
+Tutto partendo direttamente dalle tabelle del database.
+
+---
+
+## ⚡ Obiettivo
+
+Ridurre drasticamente il tempo di sviluppo:
+
+👉 da database → a API funzionante in pochi secondi.
+
+---
+
+## ✨ Features
+
+- 🧠 Generazione automatica da database
+- 📦 CRUD completo out-of-the-box
+- 🔌 API REST auto-create
+- 🔁 Routing automatico
+- 🧱 Architettura MVC
+- ⚙️ Dependency Injection Container
+- 🔐 Sicurezza integrata:
+  - CSRF protection
+  - password hashing
+  - session management
+- 📜 Supporto metodi HTTP:
+  - GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD
+- 🧾 DAO con:
+  - getAll()
+  - getById()
+  - insert / update / delete
+
+---
+
+## 🧩 Generazione automatica
+
+A partire da una tabella database:
+
+```sql
+corsi (id, nome, descrizione)
+```
+```shell
+cmd: php generator/generate.php --table=corsi --with-api
+```
+
+---
+
 
 ## Perché Banquet?
 
