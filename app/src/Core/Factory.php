@@ -171,8 +171,7 @@ class Factory {
     }
 
     public function __destruct() {
-        
-         Log::writeInfo("Factory Method>__destruct_");
+    
     }
 
     public static function getTemplate($data, $template = NULL, $children = NULL, $master_template = NULL) {
