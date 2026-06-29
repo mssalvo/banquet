@@ -93,7 +93,7 @@ A partire da una tabella database:
 corsi (id, nome, descrizione)
 ```
  
-#### php generator/generate.php --table=corsi --with-api
+#### php banquet generate --table=corsi --with-api
  
 
 Banquet genera automaticamente:
@@ -155,7 +155,7 @@ php -S localhost:8000
 php -S localhost:8000
 
 # 2. Genera l'intero stack CRUD per la tabella "corsi"
-php generator/generate.php --table=corsi --action=Corsi --with-view --with-route --with-api
+php banquet generate --table=corsi --action=Corsi --with-view --with-route --with-api
 
 # 3 Aggiorna la dump composer per le nuove classi create
 composer dump-autoload, oppure lancia il composer-dump-autoload.bat
@@ -177,11 +177,11 @@ Dimentica la scrittura boilerplate. Banquet legge lo schema del database e gener
 
 ```bash
 # Dal database
-php generator/generate.php                                # Tutte le tabelle
-php generator/generate.php --table=clienti                # Una tabella specifica
+php banquet generate                                # Tutte le tabelle
+php banquet generate --table=clienti                # Una tabella specifica
 
 # Dal Service (Action + View + Route + API)
-php generator/generate.php --action=Clienti --with-view --with-route --with-api
+php banquet generate --action=Clienti --with-view --with-route --with-api
 ```
 
   Entity → DAO → Model → Service → Action (Web) → Action (REST) → View → Route → Route API
@@ -293,7 +293,7 @@ CREATE TABLE clienti (
 );
 
 # 2. Genera tutto
-php generator/generate.php --table=clienti --action=Clienti --with-view --with-route --with-api
+php banquet generate --table=clienti --action=Clienti --with-view --with-route --with-api
 
 # 3. Fatto. Hai già:
 #    GET  /clienti          → lista (HTML)

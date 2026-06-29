@@ -1,2 +1,2 @@
 @echo off
-php generator/generate.php %*
+php banquet generate %*

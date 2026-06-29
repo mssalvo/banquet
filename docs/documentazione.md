@@ -108,11 +108,11 @@ Esegue:
 ### Comandi principali
 
 ```bash
-php generator/generate.php              # genera Entity/DAO/Model/Service per tutte le tabelle
-php generator/generate.php --table=corsi  # genera solo per la tabella specificata
-php generator/generate.php --action=Corsi --with-view --with-route  # genera Action + view + route
-php generator/generate.php --action=Corsi --with-api  # genera API REST per Corsi
-php generator/generate.php --class-dao  # genera la classe astratta Dao
+php banquet generate              # genera Entity/DAO/Model/Service per tutte le tabelle
+php banquet generate --table=corsi  # genera solo per la tabella specificata
+php banquet generate --action=Corsi --with-view --with-route  # genera Action + view + route
+php banquet generate --action=Corsi --with-api  # genera API REST per Corsi
+php banquet generate --class-dao  # genera la classe astratta Dao
 ```
 
 ### Percorsi utili
@@ -283,7 +283,7 @@ Puoi estendere `runMiddleware()` in `app/src/Core/Router.php` per altri middlewa
 
 ## 7. Generatore automatico
 
-Lo script `generator/generate.php` crea classi e file base per il progetto.
+Lo script `banquet generate` crea classi e file base per il progetto.
 
 ### Opzioni principali
 
@@ -307,12 +307,12 @@ Lo script `generator/generate.php` crea classi e file base per il progetto.
 ### Esempi di comando
 
 ```bash
-php generator/generate.php
-php generator/generate.php --table=corsi
-php generator/generate.php --action=Corsi --with-view --with-route
-php generator/generate.php --action=Corsi --with-api
-php generator/generate.php --action=Corsi --with-view --with-route --with-api
-php generator/generate.php --class-dao
+php banquet generate
+php banquet generate --table=corsi
+php banquet generate --action=Corsi --with-view --with-route
+php banquet generate --action=Corsi --with-api
+php banquet generate --action=Corsi --with-view --with-route --with-api
+php banquet generate --class-dao
 ```
 
 ### Esempio di Action generata
@@ -460,7 +460,7 @@ class Rest extends SenderAction
 ## 9. Configurazione
 
 - Le costanti di configurazione principali sono in `app/setting/config.php`
-- `generator/generate.php` legge anche `app/src/ms/ms-config.php` se non viene passato `--dsn`
+- `banquet generate` legge anche `app/src/ms/ms-config.php` se non viene passato `--dsn`
 - La lingua corrente è gestita in sessione tramite `KEY_LANG`
 - `Factory` espone `set()` e `get()` per dati globali
 

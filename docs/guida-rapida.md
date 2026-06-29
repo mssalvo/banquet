@@ -54,7 +54,7 @@ define('DB_PASSWORD', 'password');
 Esegui il comando:
 
 ```bash
-php generator/generate.php --help
+php banquet generate --help
 ```
 
 Se appare il menu del generatore, la configurazione è corretta.
@@ -64,13 +64,13 @@ Se appare il menu del generatore, la configurazione è corretta.
 Genera tutto per tutte le tabelle:
 
 ```bash
-php generator/generate.php
+php banquet generate
 ```
 
 Genera solo una tabella:
 
 ```bash
-php generator/generate.php --table=utenti
+php banquet generate --table=utenti
 ```
 
 ## 6. Genera una Action completa
@@ -78,7 +78,7 @@ php generator/generate.php --table=utenti
 Esempio:
 
 ```bash
-php generator/generate.php --action=Corsi --with-view --with-route
+php banquet generate --action=Corsi --with-view --with-route
 ```
 
 Questo genera:
@@ -90,7 +90,7 @@ Questo genera:
 ## 7. Genera anche l'API REST
 
 ```bash
-php generator/generate.php --action=Corsi --with-view --with-route --with-api
+php banquet generate --action=Corsi --with-view --with-route --with-api
 ```
 
 Questo genera anche:
@@ -117,7 +117,7 @@ http://localhost:8000/home
 ### Step 1: genera l'Action
 
 ```bash
-php generator/generate.php --action=Prodotti --with-view --with-route
+php banquet generate --action=Prodotti --with-view --with-route
 ```
 
 ### Step 2: apri la rotta generata
@@ -145,7 +145,7 @@ Aggiungi il markup HTML che desideri.
 Per una tabella chiamata `iscrizione`:
 
 ```bash
-php generator/generate.php --action=Iscrizione --with-api
+php banquet generate --action=Iscrizione --with-api
 ```
 
 Le route saranno disponibili come:

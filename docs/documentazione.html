@@ -191,11 +191,11 @@
       </ol>
 
       <h3>Quickstart</h3>
-      <pre>php generator/generate.php
-php generator/generate.php --table=corsi
-php generator/generate.php --action=Corsi --with-view --with-route
-php generator/generate.php --action=Corsi --with-api
-php generator/generate.php --class-dao</pre>
+      <pre>php banquet generate
+php banquet generate --table=corsi
+php banquet generate --action=Corsi --with-view --with-route
+php banquet generate --action=Corsi --with-api
+php banquet generate --class-dao</pre>
     </section>
 
     <section id="routing">
@@ -269,7 +269,7 @@ $router->get('/login', \Banquet\Actions\Login::class)->middleware('guest');</pre
 
     <section id="generator">
       <h2>7. Generatore automatico</h2>
-      <p>Lo script <code>generator/generate.php</code> crea classi e file base per Entity, DAO, Model, Service, Action, View e API REST.</p>
+      <p>IL comando CLI <code>banquet generate</code> crea classi e file base per Entity, DAO, Model, Service, Action, View e API REST.</p>
       <h3>Opzioni principali</h3>
       <ul>
         <li><code>--dsn</code></li>
@@ -284,10 +284,10 @@ $router->get('/login', \Banquet\Actions\Login::class)->middleware('guest');</pre
         <li><code>--class-dao</code></li>
       </ul>
       <h3>Esempi</h3>
-      <pre>php generator/generate.php
-php generator/generate.php --table=corsi
-php generator/generate.php --action=Corsi --with-view --with-route
-php generator/generate.php --action=Corsi --with-api</pre>
+      <pre>php banquet generate
+php banquet generate --table=corsi
+php banquet generate --action=Corsi --with-view --with-route
+php banquet generate --action=Corsi --with-api</pre>
     </section>
   </div>
 </body>
