@@ -136,7 +136,10 @@ php -S localhost:8000
 # 2. Genera l'intero stack CRUD per la tabella "corsi"
 php generator/generate.php --table=corsi --action=Corsi --with-view --with-route --with-api
 
-# 3. Visita
+# 3 Aggiorna la dump composer per le nuove classi create
+composer dump-autoload, oppure lancia il composer-dump-autoload.bat
+
+# 4. Visita
 #    http://localhost:8000/corsi      ← Lista corsi (HTML)
 #    http://localhost:8000/api/corsi   ← Lista corsi (JSON)
 ```
