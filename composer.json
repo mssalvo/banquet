@@ -23,6 +23,9 @@
       "role": "Developer"
     }
   ],
+  "bin": [
+  "banquet"
+  ],
   "support": {
     "issues": "https://github.com/mssalvo/banquet/issues",
     "source": "https://github.com/mssalvo/banquet"

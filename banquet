@@ -1,0 +1,47 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+echo "🚀 Banquet CLI\n\n";
+
+$args = $argv;
+array_shift($args); // rimuove script
+
+$command = $args[0] ?? null;
+
+if (!$command) {
+    echo "Usage:\n";
+    echo "  banquet generate [options]\n\n";
+    echo "Examples:\n";
+    echo "  banquet generate --table=corsi\n";
+    echo "  banquet generate --action=Corsi --with-view --with-route\n";
+    exit;
+}
+
+switch ($command) {
+
+    case 'generate':
+
+        // ricostruisce argomenti CLI
+        $params = implode(' ', array_slice($args, 1));
+
+        $script = __DIR__ . '/generator/generate.php';
+
+        if (!file_exists($script)) {
+            echo "❌ Generator non trovato\n";
+            exit(1);
+        }
+
+        // esegue script originale
+        $cmd = "php \"$script\" $params";
+
+        passthru($cmd, $status);
+
+        exit($status);
+
+    default:
+        echo "❌ Comando non riconosciuto: $command\n\n";
+        echo "Usa:\n";
+        echo "  banquet generate\n";
+}
