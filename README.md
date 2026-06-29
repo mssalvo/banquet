@@ -14,10 +14,31 @@
 <img src="https://img.shields.io/badge/MySQL-%20%7C%20?style=flat-square">
 <img src="https://img.shields.io/badge/Server-4479A1?style=flat-square">
 <img src="https://img.shields.io/badge/SQLite-%20%7C%20SQL%20Server-4479A1?style=flat-square">
-  <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square">
+  <img src="https://img.shields.io/packagist/v/mssalvo/banquet">
+<img src="https://img.shields.io/packagist/dt/mssalvo/banquet">
+<img src="https://img.shields.io/badge/license-MIT-green?style=flat-square">
 </p>
+ 
+---
+
+## 🚀 Installazione
+
+```bash
+composer create-project mssalvo/banquet my-app
+cd my-app
+php -S localhost:8000
+```
 
 ---
+
+👉 step reali:
+
+```md
+1. Crea una tabella DB
+2. Lancia il generator
+3. API pronta
+
+```
 
 ## 🚀 Cos'è Banquet
 
