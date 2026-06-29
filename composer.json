@@ -1,8 +1,19 @@
 {
   "name": "mssalvo/banquet",
-  "description": "Un framework leggero e veloce per lo sviluppo di Applicazioni Web e API REST in PHP",
+  "description": "Un framework development Tool leggero e veloce per lo sviluppo di Applicazioni Web e API REST in PHP",
   "type": "project",
-  "keywords": ["framework", "api", "rest", "router"],
+  "keywords": [
+    "framework",
+    "development",
+    "tool",
+    "php",
+    "generator",
+    "web",
+    "api",
+    "rest",
+    "router",
+    "banquet"
+  ],
   "homepage": "https://github.com/mssalvo/banquet",
   "license": "MIT",
   "authors": [
@@ -13,10 +24,10 @@
     }
   ],
   "support": {
-    "issues": "https://github.com/banquet/issues",
+    "issues": "https://github.com/mssalvo/banquet/issues",
     "source": "https://github.com/mssalvo/banquet"
   },
-   "autoload": {
+  "autoload": {
     "psr-4": {
       "Banquet\\": "app/src/"
     },
@@ -25,11 +36,10 @@
       "./app/src/ms/helper/helpers.php",
       "./app/src/ms/ms-config.php",
       "./app/setting/startup.php",
-      "./app/src/ms/util/htmlreport.php"      
-
+      "./app/src/ms/util/htmlreport.php"
     ]
   },
   "require": {
-    "php": ">=7.4" 
-    }
+    "php": ">=7.4"
+  }
 }
