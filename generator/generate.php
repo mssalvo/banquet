@@ -9,6 +9,15 @@
  *   php generator/generate.php
  *   php generator/generate.php --table=nome_tabella
  *   php generator/generate.php --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
+ * 
+ * ______________________________________________________________________________
+ *
+ * This file is part of Banquet.
+ *
+ * (c) Salvatore Mariniello <salvo.mariniello@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 // ──────────────────────────────────────────────────────────────────────────────
