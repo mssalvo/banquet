@@ -18,7 +18,7 @@ class MakeMapCommand extends Command
     public function handle(array $args)
     {
         $table = $args[0] ?? null;
-
+        $fullAction = $args[1] ?? null;
         if (!$table) {
             echo "❌ Specifica una tabella\n O digita il parametro all per indicare tutte\n make:map all";
             return;
@@ -32,7 +32,14 @@ class MakeMapCommand extends Command
 
             echo "✅ CRUD generato\n";
 
-        } else {
+        }elseif($table != "all" && $fullAction!=null && $fullAction=="full-action" )  {
+      echo "⚡ Generazione Entity, Dao, Crud, Model, Service per: $table\n";
+            $cmd = "php bin/generate --table=$table --action=$table --with-view --with-route --with-api";
+            passthru($cmd);
+
+            echo "✅ CRUD generato\n";
+        }
+         else {
             echo "⚡ Generazione Entity, Dao, Crud, Model, Service per: $table\n";
             $cmd = "php bin/generate --table=$table";
             passthru($cmd);
