@@ -18,6 +18,15 @@ class MakeActionCommand extends Command
     public function handle(array $args,array $arra_associativo)
     {
  
+        $hasNotView  = isset($arra_associativo['not-view']);
+        $stringParam="--with-view --with-route";
+        if ($hasNotView) {
+        $stringParam= str_replace('--with-view', '', $stringParam);    
+        }
+         $hasNotRoute  = isset($arra_associativo['not-route']);
+        if ($hasNotRoute) {
+         $stringParam= str_replace('--with-route', '', $stringParam);
+        }
         $action = $args[0] ?? null;
         $service = $args[1] ?? null;
         if (!$action) {
@@ -30,13 +39,13 @@ class MakeActionCommand extends Command
 
         if ($service == null && $this->checkExist($action)) {
             echo "✅ Procedo alla creazione della singola action: $action\n";
-            passthru("php bin/generate --action=$action --with-service --with-view --with-route");
+            passthru("php bin/generate --action=$action --with-service $stringParam");
         } elseif ($service != null && $this->checkExist($service)) {
             echo "✅ Procedo alla creazione action: $action con service\n";
-            passthru("php bin/generate --action=$action --action-service=$service --with-service --with-view --with-route");
+            passthru("php bin/generate --action=$action --action-service=$service --with-service $stringParam");
         } else {
             echo "✅ Procedo alla creazione action: $action\n";
-            passthru("php bin/generate --action=$action --with-view --with-route");
+            passthru("php bin/generate --action=$action $stringParam");
         }
 
     }

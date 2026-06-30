@@ -42,6 +42,18 @@ if (!$inputCommand) {
          passthru("php bin/generate --help"); 
            exit;
         }
+        $hasDao = isset($arrayAssociativo['class-dao']);
+        if ($hasDao) {
+        passthru("php bin/generate --class-dao"); 
+           exit;
+        }
+        $hasView = isset($arrayAssociativo['action-  view']);
+        if ($hasView) {
+        $actinView=$arrayAssociativo['action-view'] ?? '';
+        passthru("php bin/generate --action-view=$actinView"); 
+           exit;
+        }
+         
 
 // esegui comando
 if (isset($commands[$inputCommand])) {
@@ -70,7 +82,7 @@ foreach ($argomenti_grezzi as $arg) {
     }
 }
 
-//print_r($argomenti_associativi);
+
 return $argomenti_associativi;
 
 }

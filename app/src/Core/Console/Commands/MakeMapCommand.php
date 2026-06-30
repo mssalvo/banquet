@@ -32,6 +32,17 @@ class MakeMapCommand extends Command
          $stringPrefix=' --prefix='.$arra_associativo['prefix'] ?? '';
         }
 
+        
+        $hasNotView  = isset($arra_associativo['not-view']);
+        $stringParam='--with-view --with-route';
+        if ($hasNotView) {
+        $stringParam = str_replace('--with-view', '', $stringParam);    
+        }
+        $hasNotRoute = isset($arra_associativo['not-route']);
+        if ($hasNotRoute) {
+         $stringParam = str_replace('--with-route', '', $stringParam);
+        }
+         
         $table = $args[0] ?? null;
         $fullAction = $args[1] ?? null;
         if (!$table) {
@@ -56,9 +67,9 @@ class MakeMapCommand extends Command
             echo "⚡ Generazione Entity, Dao, Crud, Model, Service per: $table\n";
             $cmd = "";
             if($hasDns){ 
-             $cmd = "php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$table --action=$table $stringPrefix --with-view --with-route --with-api"; 
+             $cmd = "php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$table --action=$table $stringPrefix $stringParam --with-api"; 
             } else {
-             $cmd = "php bin/generate --table=$table --action=$table $stringPrefix --with-view --with-route --with-api"; 
+             $cmd = "php bin/generate --table=$table --action=$table $stringPrefix $stringParam --with-api"; 
             }
             passthru($cmd);
 
