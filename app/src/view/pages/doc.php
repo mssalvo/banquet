@@ -175,8 +175,8 @@
 │       ├── Driver/
 │       ├── routes/
 │       └── view/
-└── generator/
-    └── generate.php</pre>
+└── bin/
+     </pre>
     </section>
 
     <section id="request">
@@ -191,11 +191,13 @@
       </ol>
 
       <h3>Quickstart</h3>
-      <pre>php banquet generate
-php banquet generate --table=corsi
-php banquet generate --action=Corsi --with-view --with-route
-php banquet generate --action=Corsi --with-api
-php banquet generate --class-dao</pre>
+      <pre>php banquet make:map all
+php banquet make:map corsi
+php banquet make:action Corsi
+php banquet make:api Corsi  
+php banquet --class-dao
+php banquet --help
+</pre>
     </section>
 
     <section id="routing">
@@ -275,19 +277,14 @@ $router->get('/login', \Banquet\Actions\Login::class)->middleware('guest');</pre
         <li><code>--dsn</code></li>
         <li><code>--user</code></li>
         <li><code>--pass</code></li>
-        <li><code>--table</code></li>
         <li><code>--prefix</code></li>
-        <li><code>--action</code></li>
-        <li><code>--with-view</code></li>
-        <li><code>--with-route</code></li>
-        <li><code>--with-api</code></li>
         <li><code>--class-dao</code></li>
       </ul>
       <h3>Esempi</h3>
-      <pre>php banquet generate
-php banquet generate --table=corsi
-php banquet generate --action=Corsi --with-view --with-route
-php banquet generate --action=Corsi --with-api</pre>
+      <pre>php banquet make:map all
+php banquet make:map corsi
+php banquet make:action Corsi 
+php banquet make:api Corsi </pre>
     </section>
   </div>
 </body>

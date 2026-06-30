@@ -79,16 +79,19 @@
       <p>Questa pagina mostra un flusso step-by-step per avviare un progetto Banquet, configurare il database e generare i componenti.</p>
     </div>
 
-    <div class="card">
+ 
+   <div class="card">
       <div class="step">
         <div class="step-number">1</div>
         <div>
-          <h3>Scarica il progetto</h3>
-          <pre>git clone &lt;url-del-repo&gt;
-cd banquet</pre>
+          <h3>Crea porgetto</h3>
+          <pre>composer create-project mssalvo/banquet my-app
+    cd my-app
+    php -S localhost:8000</pre>
         </div>
       </div>
     </div>
+ 
 
     <div class="card">
       <div class="step">
@@ -120,8 +123,8 @@ define('DB_PASSWORD', '');</pre>
         <div class="step-number">4</div>
         <div>
           <h3>Esegui il generator</h3>
-          <pre>php banquet generate</pre>
-          <p class="muted">Puoi anche generare una singola tabella con <code>--table=utenti</code>.</p>
+          <pre>php banquet make:map all</pre>
+          <p class="muted">Puoi anche generare una singola tabella con <code>php banquet make:map nome-tabella</code>.</p>
         </div>
       </div>
     </div>
@@ -131,7 +134,7 @@ define('DB_PASSWORD', '');</pre>
         <div class="step-number">5</div>
         <div>
           <h3>Genera una Action completa</h3>
-          <pre>php banquet generate --action=Corsi --with-view --with-route</pre>
+          <pre>php banquet make:action corsi</pre>
           <p class="muted">Questo genera Action, View e rotta.</p>
         </div>
       </div>
@@ -141,8 +144,8 @@ define('DB_PASSWORD', '');</pre>
       <div class="step">
         <div class="step-number">6</div>
         <div>
-          <h3>Genera anche l'API REST</h3>
-          <pre>php banquet generate --action=Corsi --with-view --with-route --with-api</pre>
+          <h3>Genera l'API REST</h3>
+          <pre>php banquet make:api Corsi </pre>
           <p class="muted">Verranno create anche le route API.</p>
         </div>
       </div>
@@ -164,7 +167,7 @@ define('DB_PASSWORD', '');</pre>
         <div class="step-number">8</div>
         <div>
           <h3>Esempio pratico</h3>
-          <pre>php banquet generate --action=Prodotti --with-view --with-route</pre>
+          <pre>php banquet make:action prodotti</pre>
           <p class="muted">La nuova pagina sarà raggiungibile su <code>/prodotti</code>.</p>
         </div>
       </div>

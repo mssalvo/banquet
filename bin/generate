@@ -54,7 +54,7 @@ foreach ($configFiles as $f) {
 // 2. Linea di comando
 // ──────────────────────────────────────────────────────────────────────────────
 
-$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-service:','action-api:', 'action-view:', 'with-view', 'with-route', 'with-api','with-service','class-dao', 'help']);
+$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-service:','action-api:', 'action-view:', 'with-view','not-view', 'with-route','not-route', 'with-api','with-service','class-dao', 'help']);
 $tableFilter = $options['table'] ?? null;
 
 if (isset($options['help'])) {
@@ -62,33 +62,33 @@ if (isset($options['help'])) {
 Banquet Class Generator
 
 Opzioni:
-  --dsn=DSN       DSN di connessione PDO (es. mysql:host=localhost;dbname=test)
-  --user=USER     Username database
-  --pass=PASS     Password database
-  --table=TABELLA Genera solo per una tabella specifica
-  --prefix=PREFIX Prefisso tabella da rimuovere (es. "tbl_")
-   --action=NOME       Genera Action per il Service specificato (es. Corsi)
-   --action-api=NOME   Genera solo la REST Api in Actions/Api/ (es. Corsi)
-   --action-view=NOME  Genera solo la View in view/pages/ (es. Corsi)
-   --with-view         Genera anche la View associata (usato con --action)
-   --with-route        Aggiunge la rotta in web.php (usato con --action)
-   --with-api          Genera anche la REST Api in Actions/Api/ (usato con --action)
-   --class-dao         Genera la abstract class Dao in src/Dao
-   --help              Questo messaggio
+  --dsn=DSN         DSN di connessione PDO (es. mysql:host=localhost;dbname=test)
+  --user=USER       Username database
+  --pass=PASS       Password database
+  --prefix=PREFIX   Prefisso tabella da rimuovere (es. "tbl_")
+  --class-dao       Genera la abstract class Dao in src/Dao
+  --not-view        Non crea la view in automatico (associata all'Action)
+  --not-route       Non crea l'endpoind nel router (associato all'Action)
+  --help            Questo messaggio
+
 
 Se --dsn non viene fornito, il generatore usa le costanti DB_*
 definite in app/src/ms/ms-config.php.
 
 Esempi:
-   php generator/generate.php
-   php generator/generate.php --table=corsi
-   php generator/generate.php --action=Corsi --with-view --with-route
-   php generator/generate.php --action=Corsi --with-api
-   php generator/generate.php --action=Corsi --with-view --with-route --with-api
-   php generator/generate.php --action-api=Corsi
-   php generator/generate.php --action-view=Corsi
-   php generator/generate.php --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
-   php generator/generate.php --class-dao
+   php banquet make:map all
+   php banquet make:map all --prefix=tbl_
+   php banquet make:map all --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
+   php banquet make:map corsi 
+   php banquet make:map corsi full-action 
+   php banquet make:api corsi 
+   php banquet make:api corsi --prefix=tbl_ --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
+   php banquet make:action corsi 
+   php banquet make:action <nome-action> <nome-service>
+   php banquet --class-dao
+   php banquet --help
+   php banquet --action-view=corsi
+   php banquet --class-dao
 HELP;
     exit(0);
 }
@@ -1086,17 +1086,20 @@ if ($hasActionMode) {
     $withService = isset($options['with-service']);
 
     $withApi   = isset($options['with-api']);
+    $withTable   = isset($options['table']);
 
     echo "━━━ Action: {$actionName} ━━━\n";
 
     // Action
     $code="";
-    if($hasActionService && $withService){
+    if($withTable){
+    $code = generateActionCode($actionName,null);     
+    } elseif($hasActionService && $withService){
      $actionService = preg_replace('/Service$/', '', $options['action-service']);    
     $code = generateActionCode($actionName,$actionService);     
-    }elseif($withService){
+    } elseif($withService){
     $code = generateActionCode($actionName,null);     
-    }else{
+    } else{
     $code = generateActionCodeNotService($actionName);
     }
     writeFile($ACTION_DIR . "/{$actionName}.php", $code);

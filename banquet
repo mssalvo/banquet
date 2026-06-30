@@ -3,45 +3,86 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-echo "🚀 Banquet CLI\n\n";
+use Banquet\Core\Console\Commands\MakeMapCommand;
+use Banquet\Core\Console\Commands\MakeApiCommand;
+use Banquet\Core\Console\Commands\MakeActionCommand; 
 
+// registra comandi
+$commands = [
+    'make:map' => new MakeMapCommand(),
+    'make:api' => new MakeApiCommand(),
+    'make:action' => new MakeActionCommand(),
+    '--help' => new MakeActionCommand()
+];
+
+// input
 $args = $argv;
-array_shift($args); // rimuove script
+array_shift($args);
 
-$command = $args[0] ?? null;
+$inputCommand = $args[0] ?? null;
+$params = array_slice($args, 1);
 
-if (!$command) {
-    echo "Usage:\n";
-    echo "  banquet generate [options]\n\n";
-    echo "Examples:\n";
-    echo "  banquet generate --table=corsi\n";
-    echo "  banquet generate --action=Corsi --with-view --with-route\n";
+$arrayAssociativo=converti_array_asspciativa($args);
+
+
+// help globale
+if (!$inputCommand) {
+    echo "🚀 Banquet CLI\n\n";
+    echo "Comandi disponibili:\n";
+
+    foreach ($commands as $name => $cmd) {
+        echo "  $name\t" . $cmd->getDescription() . "\n";
+    }
+
     exit;
 }
 
-switch ($command) {
-
-    case 'generate':
-
-        // ricostruisce argomenti CLI
-        $params = implode(' ', array_slice($args, 1));
-
-        $script = __DIR__ . '/generator/generate.php';
-
-        if (!file_exists($script)) {
-            echo "❌ Generator non trovato\n";
-            exit(1);
+       $hasHelp  = isset($arrayAssociativo['help']);
+        if ($hasHelp) {
+         passthru("php bin/generate --help"); 
+           exit;
         }
+        $hasDao = isset($arrayAssociativo['class-dao']);
+        if ($hasDao) {
+        passthru("php bin/generate --class-dao"); 
+           exit;
+        }
+        $hasView = isset($arrayAssociativo['action-view']);
+        if ($hasView) {
+        $actinView=$arrayAssociativo['action-view'] ?? '';
+        passthru("php bin/generate --action-view=$actinView"); 
+           exit;
+        }
+         
 
-        // esegue script originale
-        $cmd = "php \"$script\" $params";
+// esegui comando
+if (isset($commands[$inputCommand])) {
+    $commands[$inputCommand]->handle($params,$arrayAssociativo);
+} else {
+    echo "❌ Comando non trovato: $inputCommand\n";
+}
 
-        passthru($cmd, $status);
+function converti_array_asspciativa($args) {    
+    $argomenti_grezzi =$args;
 
-        exit($status);
+$argomenti_associativi = [];
 
-    default:
-        echo "❌ Comando non riconosciuto: $command\n\n";
-        echo "Usa:\n";
-        echo "  banquet generate\n";
+foreach ($argomenti_grezzi as $arg) {
+     
+    $arg_pulito = ltrim($arg, '-');
+    
+     
+    if (strpos($arg_pulito, '=') !== false) {
+       
+        list($chiave, $valore) = explode('=', $arg_pulito, 2);
+        $argomenti_associativi[$chiave] = $valore;
+    } else {
+         
+        $argomenti_associativi[$arg_pulito] = true;
+    }
+}
+
+
+return $argomenti_associativi;
+
 }

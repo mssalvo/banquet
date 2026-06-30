@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * Banquet Class Generator
@@ -53,7 +54,7 @@ foreach ($configFiles as $f) {
 // 2. Linea di comando
 // ──────────────────────────────────────────────────────────────────────────────
 
-$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-api:', 'action-view:', 'with-view', 'with-route', 'with-api','class-dao', 'help']);
+$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-service:','action-api:', 'action-view:', 'with-view','not-view', 'with-route','not-route', 'with-api','with-service','class-dao', 'help']);
 $tableFilter = $options['table'] ?? null;
 
 if (isset($options['help'])) {
@@ -61,33 +62,33 @@ if (isset($options['help'])) {
 Banquet Class Generator
 
 Opzioni:
-  --dsn=DSN       DSN di connessione PDO (es. mysql:host=localhost;dbname=test)
-  --user=USER     Username database
-  --pass=PASS     Password database
-  --table=TABELLA Genera solo per una tabella specifica
-  --prefix=PREFIX Prefisso tabella da rimuovere (es. "tbl_")
-   --action=NOME       Genera Action per il Service specificato (es. Corsi)
-   --action-api=NOME   Genera solo la REST Api in Actions/Api/ (es. Corsi)
-   --action-view=NOME  Genera solo la View in view/pages/ (es. Corsi)
-   --with-view         Genera anche la View associata (usato con --action)
-   --with-route        Aggiunge la rotta in web.php (usato con --action)
-   --with-api          Genera anche la REST Api in Actions/Api/ (usato con --action)
-   --class-dao         Genera la abstract class Dao in src/Dao
-   --help              Questo messaggio
+  --dsn=DSN         DSN di connessione PDO (es. mysql:host=localhost;dbname=test)
+  --user=USER       Username database
+  --pass=PASS       Password database
+  --prefix=PREFIX   Prefisso tabella da rimuovere (es. "tbl_")
+  --class-dao       Genera la abstract class Dao in src/Dao
+  --not-view        Non crea la view in automatico (associata all'Action)
+  --not-route       Non crea l'endpoind nel router (associato all'Action)
+  --help            Questo messaggio
+
 
 Se --dsn non viene fornito, il generatore usa le costanti DB_*
 definite in app/src/ms/ms-config.php.
 
 Esempi:
-   php generator/generate.php
-   php generator/generate.php --table=corsi
-   php generator/generate.php --action=Corsi --with-view --with-route
-   php generator/generate.php --action=Corsi --with-api
-   php generator/generate.php --action=Corsi --with-view --with-route --with-api
-   php generator/generate.php --action-api=Corsi
-   php generator/generate.php --action-view=Corsi
-   php generator/generate.php --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
-   php generator/generate.php --class-dao
+   php banquet make:map all
+   php banquet make:map all --prefix=tbl_
+   php banquet make:map all --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
+   php banquet make:map corsi 
+   php banquet make:map corsi full-action 
+   php banquet make:api corsi 
+   php banquet make:api corsi --prefix=tbl_ --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
+   php banquet make:action corsi 
+   php banquet make:action <nome-action> <nome-service>
+   php banquet --class-dao
+   php banquet --help
+   php banquet --action-view=corsi
+   php banquet --class-dao
 HELP;
     exit(0);
 }
@@ -110,6 +111,7 @@ if ($hasClassAbstractDao) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 $hasActionMode = isset($options['action']);
+$hasActionService = isset($options['action-service']);
 $hasApiMode    = isset($options['action-api']);
 $hasViewMode   = isset($options['action-view']);
 $hasCustomMode = $hasActionMode || $hasApiMode || $hasViewMode;
@@ -239,10 +241,11 @@ function toPascalCase(string $name, string $prefix = ''): string
     $name = str_replace(['-', '/'], '_', $name);
     $name = preg_replace('/[^A-Za-z0-9_]+/', ' ', $name);
     $name = preg_replace('/_+/', '_', $name);
-    $name = ucwords(str_replace('_', ' ', strtolower($name)));
+    $name = ucwords(str_replace('_', ' ', $name));
     $name = str_replace(' ', '', $name);
 
     return $name !== '' ? ucfirst($name) : 'Class';
+     
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -573,10 +576,10 @@ PHP;
 // 10. Generazione Action
 // ──────────────────────────────────────────────────────────────────────────────
 
-function generateActionCode(string $className): string
+function generateActionCode(string $className,string $service=null): string
 {   $className  = toPascalCase($className, '');
     $entityVar  = lcfirst($className);
-    $serviceClass = $className . 'Service';
+    $serviceClass =$service?(toPascalCase($service, '').'Service'): ($className . 'Service');
     $routeName  = strtolower($entityVar);
     $date       = date('d/m/Y H:i:s');
 
@@ -612,6 +615,49 @@ class {$className} extends SenderAction{
 
 PHP;
 }
+
+function generateActionCodeNotService(string $className): string
+{   $className  = toPascalCase($className, '');
+    $entityVar  = lcfirst($className);
+    $serviceClass = $className . 'Service';
+    $routeName  = strtolower($entityVar);
+    $date       = date('d/m/Y H:i:s');
+
+    return <<<PHP
+<?php
+
+namespace Banquet\Actions;
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Action  {$className}
+ */
+
+use Banquet\Core\SenderAction;
+
+
+class {$className} extends SenderAction{
+     
+    public function __construct() {
+        
+    }
+
+    public function send() {
+         \$this->setTemplateName("pages/{$routeName}");
+
+         \$this->varAdd("{$entityVar}", [(object)['id'=>'Hello my action {$className}']]);
+
+        return \$this->getTemplate("default");
+    }
+}
+
+PHP;
+}
+
+
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // 11. Generazione View
@@ -960,12 +1006,16 @@ PHP;
 
 function writeFile(string $path, string $content): void
 {
+    if(!file_exists($path)) {
     $dir = dirname($path);
     if (!is_dir($dir)) {
         mkdir($dir, 0777, true);
     }
     file_put_contents($path, $content);
     echo "  ✓ " . basename($path) . "\n";
+    } else {
+     echo "  ∼ Il file esistente non viene creato " . basename($path) . "\n";
+    }
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -1033,16 +1083,28 @@ if ($hasActionMode) {
     $routeName = strtolower($entityVar);
     $withView  = isset($options['with-view']);
     $withRoute = isset($options['with-route']);
+    $withService = isset($options['with-service']);
 
     $withApi   = isset($options['with-api']);
+    $withTable   = isset($options['table']);
 
     echo "━━━ Action: {$actionName} ━━━\n";
 
     // Action
-    $code = generateActionCode($actionName);
+    $code="";
+    if($withTable){
+    $code = generateActionCode($actionName,null);     
+    } elseif($hasActionService && $withService){
+     $actionService = preg_replace('/Service$/', '', $options['action-service']);    
+    $code = generateActionCode($actionName,$actionService);     
+    } elseif($withService){
+    $code = generateActionCode($actionName,null);     
+    } else{
+    $code = generateActionCodeNotService($actionName);
+    }
     writeFile($ACTION_DIR . "/{$actionName}.php", $code);
     $created[] = ['type' => 'Action', 'path' => $ACTION_DIR . "/{$actionName}.php", 'name' => $actionName];
-
+    
     // REST Api
     if ($withApi) {
         $code = generateApiCode($actionName);
