@@ -1,5 +1,11 @@
 <?php
 
+/** This file is part of Banquet.
+ * (c) Salvatore Mariniello <salvo.mariniello@gmail.com>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Banquet\Core\Console\Commands;
 
 use Banquet\Core\Console\Command;
@@ -17,7 +23,7 @@ class MakeApiCommand extends Command
             echo "❌ Specifica una tabella\n";
             return;
         }
-    if($this->checkEsixt($table)) {
+    if($this->checkExists($table)) {
     echo "✅ File Esiste\n";    
     passthru("php bin/generate --action-api=$table");
     } else {
@@ -34,14 +40,14 @@ private function toPascalCase(string $name)
     $name = str_replace(['-', '/'], '_', $name);
     $name = preg_replace('/[^A-Za-z0-9_]+/', ' ', $name);
     $name = preg_replace('/_+/', '_', $name);
-    $name = ucwords(str_replace('_', ' ', strtolower($name)));
+    $name = ucwords(str_replace('_', ' ', $name));
     $name = str_replace(' ', '', $name);
 
     return $name !== '' ? ucfirst($name) : 'Class';
 }
 
 
-private function checkEsixt(string $name){
+private function checkExists(string $name){
 $BASE_DIR = dirname(DIR_APP);
 $SRC_DIR  = $BASE_DIR . '/app/src';
 
