@@ -54,7 +54,7 @@ foreach ($configFiles as $f) {
 // 2. Linea di comando
 // ──────────────────────────────────────────────────────────────────────────────
 
-$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-api:', 'action-view:', 'with-view', 'with-route', 'with-api','class-dao', 'help']);
+$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-service:','action-api:', 'action-view:', 'with-view', 'with-route', 'with-api','with-service','class-dao', 'help']);
 $tableFilter = $options['table'] ?? null;
 
 if (isset($options['help'])) {
@@ -111,6 +111,7 @@ if ($hasClassAbstractDao) {
 // ──────────────────────────────────────────────────────────────────────────────
 
 $hasActionMode = isset($options['action']);
+$hasActionService = isset($options['action-service']);
 $hasApiMode    = isset($options['action-api']);
 $hasViewMode   = isset($options['action-view']);
 $hasCustomMode = $hasActionMode || $hasApiMode || $hasViewMode;
@@ -240,10 +241,11 @@ function toPascalCase(string $name, string $prefix = ''): string
     $name = str_replace(['-', '/'], '_', $name);
     $name = preg_replace('/[^A-Za-z0-9_]+/', ' ', $name);
     $name = preg_replace('/_+/', '_', $name);
-    $name = ucwords(str_replace('_', ' ', strtolower($name)));
+    $name = ucwords(str_replace('_', ' ', $name));
     $name = str_replace(' ', '', $name);
 
     return $name !== '' ? ucfirst($name) : 'Class';
+     
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -574,10 +576,10 @@ PHP;
 // 10. Generazione Action
 // ──────────────────────────────────────────────────────────────────────────────
 
-function generateActionCode(string $className): string
+function generateActionCode(string $className,string $service=null): string
 {   $className  = toPascalCase($className, '');
     $entityVar  = lcfirst($className);
-    $serviceClass = $className . 'Service';
+    $serviceClass =$service?(toPascalCase($service, '').'Service'): ($className . 'Service');
     $routeName  = strtolower($entityVar);
     $date       = date('d/m/Y H:i:s');
 
@@ -613,6 +615,49 @@ class {$className} extends SenderAction{
 
 PHP;
 }
+
+function generateActionCodeNotService(string $className): string
+{   $className  = toPascalCase($className, '');
+    $entityVar  = lcfirst($className);
+    $serviceClass = $className . 'Service';
+    $routeName  = strtolower($entityVar);
+    $date       = date('d/m/Y H:i:s');
+
+    return <<<PHP
+<?php
+
+namespace Banquet\Actions;
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Action  {$className}
+ */
+
+use Banquet\Core\SenderAction;
+
+
+class {$className} extends SenderAction{
+     
+    public function __construct() {
+        
+    }
+
+    public function send() {
+         \$this->setTemplateName("pages/{$routeName}");
+
+         \$this->varAdd("{$entityVar}", [(object)['id'=>'Hello my action {$className}']]);
+
+        return \$this->getTemplate("default");
+    }
+}
+
+PHP;
+}
+
+
+
 
 // ──────────────────────────────────────────────────────────────────────────────
 // 11. Generazione View
@@ -961,12 +1006,16 @@ PHP;
 
 function writeFile(string $path, string $content): void
 {
+    if(!file_exists($path)) {
     $dir = dirname($path);
     if (!is_dir($dir)) {
         mkdir($dir, 0777, true);
     }
     file_put_contents($path, $content);
     echo "  ✓ " . basename($path) . "\n";
+    } else {
+     echo "  ∼ Il file esistente non viene creato " . basename($path) . "\n";
+    }
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -1034,16 +1083,25 @@ if ($hasActionMode) {
     $routeName = strtolower($entityVar);
     $withView  = isset($options['with-view']);
     $withRoute = isset($options['with-route']);
+    $withService = isset($options['with-service']);
 
     $withApi   = isset($options['with-api']);
 
     echo "━━━ Action: {$actionName} ━━━\n";
 
     // Action
-    $code = generateActionCode($actionName);
+    $code="";
+    if($hasActionService && $withService){
+     $actionService = preg_replace('/Service$/', '', $options['action-service']);    
+    $code = generateActionCode($actionName,$actionService);     
+    }elseif($withService){
+    $code = generateActionCode($actionName,null);     
+    }else{
+    $code = generateActionCodeNotService($actionName);
+    }
     writeFile($ACTION_DIR . "/{$actionName}.php", $code);
     $created[] = ['type' => 'Action', 'path' => $ACTION_DIR . "/{$actionName}.php", 'name' => $actionName];
-
+    
     // REST Api
     if ($withApi) {
         $code = generateApiCode($actionName);
