@@ -15,8 +15,9 @@ class MakeActionCommand extends Command
     protected $signature = 'make:action';
     protected $description = 'Genera Action MVC';
 
-    public function handle(array $args)
+    public function handle(array $args,array $arra_associativo)
     {
+ 
         $action = $args[0] ?? null;
         $service = $args[1] ?? null;
         if (!$action) {

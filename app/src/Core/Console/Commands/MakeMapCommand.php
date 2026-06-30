@@ -15,8 +15,23 @@ class MakeMapCommand extends Command
     protected $signature = 'make:map';
     protected $description = 'Genera Entity, Dao con Crud completa, Model, Service, per una tabella';
 
-    public function handle(array $args)
+    public function handle(array $args,array $arra_associativo)
     {
+            $dsn  ='';
+            $user = '';
+            $pass = '';  
+        $hasDns  = isset($arra_associativo['dsn']);
+        if ($hasDns) {
+            $dsn  = $arra_associativo['dsn'] ?? '';
+            $user = $arra_associativo['user'] ?? '';
+            $pass = $arra_associativo['pass'] ?? '';    
+        }
+        $hasPrefix  = isset($arra_associativo['prefix']);
+        $stringPrefix='';
+        if ($hasPrefix) {
+         $stringPrefix=' --prefix='.$arra_associativo['prefix'] ?? '';
+        }
+
         $table = $args[0] ?? null;
         $fullAction = $args[1] ?? null;
         if (!$table) {
@@ -27,21 +42,36 @@ class MakeMapCommand extends Command
         $cmd = "";
         if ($table == "all") {
             echo "⚡ Generazione Entity, Dao, Crud, Model, Service per tutte le tabelle\n";
-            $cmd = "php bin/generate";
+             $cmd = "";  
+            if($hasDns){ 
+             $cmd = "php bin/generate --dsn=$dsn --user=$user --pass=$pass $stringPrefix"; 
+            } else {
+             $cmd = "php bin/generate";
+            }
             passthru($cmd);
 
             echo "✅ CRUD generato\n";
 
-        }elseif($table != "all" && $fullAction!=null && $fullAction=="full-action" )  {
-      echo "⚡ Generazione Entity, Dao, Crud, Model, Service per: $table\n";
-            $cmd = "php bin/generate --table=$table --action=$table --with-view --with-route --with-api";
+        } elseif ($table != "all" && $fullAction!=null && $fullAction=="full-action" )  {
+            echo "⚡ Generazione Entity, Dao, Crud, Model, Service per: $table\n";
+            $cmd = "";
+            if($hasDns){ 
+             $cmd = "php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$table --action=$table $stringPrefix --with-view --with-route --with-api"; 
+            } else {
+             $cmd = "php bin/generate --table=$table --action=$table $stringPrefix --with-view --with-route --with-api"; 
+            }
             passthru($cmd);
 
             echo "✅ CRUD generato\n";
-        }
+          }
          else {
             echo "⚡ Generazione Entity, Dao, Crud, Model, Service per: $table\n";
-            $cmd = "php bin/generate --table=$table";
+            $cmd = "";
+            if($hasDns){ 
+            $cmd = "php bin/generate --dsn=$dsn --user=$user --pass=$pass $stringPrefix --table=$table";
+            } else {
+             $cmd = "php bin/generate $stringPrefix --table=$table";    
+            }
             passthru($cmd);
 
             echo "✅ CRUD generato\n";

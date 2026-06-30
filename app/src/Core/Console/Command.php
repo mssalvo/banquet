@@ -13,7 +13,7 @@ abstract class Command
     protected $signature = '';
     protected $description = '';
 
-    abstract public function handle(array $args);
+    abstract public function handle(array $args,array $args_list);
 
     public function getSignature()
     {

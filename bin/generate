@@ -1086,17 +1086,20 @@ if ($hasActionMode) {
     $withService = isset($options['with-service']);
 
     $withApi   = isset($options['with-api']);
+    $withTable   = isset($options['table']);
 
     echo "━━━ Action: {$actionName} ━━━\n";
 
     // Action
     $code="";
-    if($hasActionService && $withService){
+    if($withTable){
+    $code = generateActionCode($actionName,null);     
+    } elseif($hasActionService && $withService){
      $actionService = preg_replace('/Service$/', '', $options['action-service']);    
     $code = generateActionCode($actionName,$actionService);     
-    }elseif($withService){
+    } elseif($withService){
     $code = generateActionCode($actionName,null);     
-    }else{
+    } else{
     $code = generateActionCodeNotService($actionName);
     }
     writeFile($ACTION_DIR . "/{$actionName}.php", $code);
