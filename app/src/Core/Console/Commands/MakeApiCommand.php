@@ -15,8 +15,23 @@ class MakeApiCommand extends Command
     protected $signature = 'make:api';
     protected $description = 'Genera API REST';
 
-    public function handle(array $args)
+    public function handle(array $args,array $arra_associativo)
     {
+            $dsn  = '';
+            $user = '';
+            $pass = '';  
+        $hasDns  = isset($arra_associativo['dsn']);
+        if ($hasDns) {
+            $dsn  = $arra_associativo['dsn'] ?? '';
+            $user = $arra_associativo['user'] ?? '';
+            $pass = $arra_associativo['pass'] ?? '';    
+        }
+    
+         $hasPrefix  = isset($arra_associativo['prefix']);
+         $stringPrefix='';
+        if ($hasPrefix) {
+         $stringPrefix=' --prefix='.$arra_associativo['prefix'] ?? '';
+        }
         $table = $args[0] ?? null;
 
         if (!$table) {
@@ -28,7 +43,11 @@ class MakeApiCommand extends Command
     passthru("php bin/generate --action-api=$table");
     } else {
          echo "❌ File non esistono\n";
-        passthru("php bin/generate --table=$table --action-api=$table");
+       if($hasDns) {
+         passthru("php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$table $stringPrefix --action-api=$table");
+       } else {
+         passthru("php bin/generate --table=$table $stringPrefix --action-api=$table");
+       }
     }
 
     }
@@ -40,7 +59,7 @@ private function toPascalCase(string $name)
     $name = str_replace(['-', '/'], '_', $name);
     $name = preg_replace('/[^A-Za-z0-9_]+/', ' ', $name);
     $name = preg_replace('/_+/', '_', $name);
-    $name = ucwords(str_replace('_', ' ', $name));
+    $name = ucwords(str_replace('_', ' ',  $name));
     $name = str_replace(' ', '', $name);
 
     return $name !== '' ? ucfirst($name) : 'Class';

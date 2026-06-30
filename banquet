@@ -11,7 +11,8 @@ use Banquet\Core\Console\Commands\MakeActionCommand;
 $commands = [
     'make:map' => new MakeMapCommand(),
     'make:api' => new MakeApiCommand(),
-    'make:action' => new MakeActionCommand()
+    'make:action' => new MakeActionCommand(),
+    '--help' => new MakeActionCommand()
 ];
 
 // input
@@ -20,6 +21,9 @@ array_shift($args);
 
 $inputCommand = $args[0] ?? null;
 $params = array_slice($args, 1);
+
+$arrayAssociativo=converti_array_asspciativa($args);
+
 
 // help globale
 if (!$inputCommand) {
@@ -33,9 +37,52 @@ if (!$inputCommand) {
     exit;
 }
 
+       $hasHelp  = isset($arrayAssociativo['help']);
+        if ($hasHelp) {
+         passthru("php bin/generate --help"); 
+           exit;
+        }
+        $hasDao = isset($arrayAssociativo['class-dao']);
+        if ($hasDao) {
+        passthru("php bin/generate --class-dao"); 
+           exit;
+        }
+        $hasView = isset($arrayAssociativo['action-  view']);
+        if ($hasView) {
+        $actinView=$arrayAssociativo['action-view'] ?? '';
+        passthru("php bin/generate --action-view=$actinView"); 
+           exit;
+        }
+         
+
 // esegui comando
 if (isset($commands[$inputCommand])) {
-    $commands[$inputCommand]->handle($params);
+    $commands[$inputCommand]->handle($params,$arrayAssociativo);
 } else {
     echo "❌ Comando non trovato: $inputCommand\n";
+}
+
+function converti_array_asspciativa($args) {    
+    $argomenti_grezzi =$args;
+
+$argomenti_associativi = [];
+
+foreach ($argomenti_grezzi as $arg) {
+     
+    $arg_pulito = ltrim($arg, '-');
+    
+     
+    if (strpos($arg_pulito, '=') !== false) {
+       
+        list($chiave, $valore) = explode('=', $arg_pulito, 2);
+        $argomenti_associativi[$chiave] = $valore;
+    } else {
+         
+        $argomenti_associativi[$arg_pulito] = true;
+    }
+}
+
+
+return $argomenti_associativi;
+
 }
