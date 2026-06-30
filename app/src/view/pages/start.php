@@ -83,12 +83,28 @@
       <div class="step">
         <div class="step-number">1</div>
         <div>
-          <h3>Scarica il progetto</h3>
+          <h3>Scarica il progetto da git</h3>
           <pre>git clone &lt;url-del-repo&gt;
 cd banquet</pre>
         </div>
       </div>
     </div>
+   <div class="card">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div>
+          <h3>Crea porgetto con composer</h3>
+          <pre>    composer create-project mssalvo/banquet my-app
+cd my-app
+php -S localhost:8000</pre>
+        </div>
+      </div>
+    </div>
+
+
+ 
+
+
 
     <div class="card">
       <div class="step">
@@ -120,7 +136,7 @@ define('DB_PASSWORD', '');</pre>
         <div class="step-number">4</div>
         <div>
           <h3>Esegui il generator</h3>
-          <pre>php banquet generate</pre>
+          <pre>php banquet make:map all</pre>
           <p class="muted">Puoi anche generare una singola tabella con <code>php banquet make:map nome-tabella</code>.</p>
         </div>
       </div>
