@@ -154,8 +154,8 @@ php -S localhost:8000
 # 1. Avvia il server built-in PHP
 php -S localhost:8000
 
-# 2. Genera l'intero stack CRUD per la tabella "corsi" crea l'action, crea la view, crea servizio api rest GET/POST/UPDATE/DELETE ed inserisce le root
-php banquet make:map corsi full-action
+# 2. Genera l'intero stack CRUD per la tabella "corsi"
+php banquet generate --table=corsi --action=Corsi --with-view --with-route --with-api
 
 # 3 Aggiorna la dump composer per le nuove classi create
 composer dump-autoload, oppure lancia il composer-dump-autoload.bat
@@ -177,17 +177,11 @@ Dimentica la scrittura boilerplate. Banquet legge lo schema del database e gener
 
 ```bash
 # Dal database
-php banquet make:map all                    # Tutte le tabelle
-php banquet make:map clienti                # Una tabella specifica
+php banquet generate                                # Tutte le tabelle
+php banquet generate --table=clienti                # Una tabella specifica
 
-# Dal Service (Action + View + Route)
-php banquet make:action clienti 
-# Service diverso (Action +  View + Route ) inietta nel costruttore il setvice OrdiniService (se presente)
-php banquet make:action myclienti ordini  
-
-# Dal Service (API + GET/POST/UPDATE/DELETE + Route )
-php banquet make:api corsi
-
+# Dal Service (Action + View + Route + API)
+php banquet generate --action=Clienti --with-view --with-route --with-api
 ```
 
   Entity → DAO → Model → Service → Action (Web) → Action (REST) → View → Route → Route API

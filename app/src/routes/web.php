@@ -28,4 +28,12 @@ $router->post('/login', \Banquet\Actions\Login::class);
  
 
  
+
+$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class);
+$router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class);
+$router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class);
+$router->put('/api/corsi', \Banquet\Actions\Api\CorsiRest::class);
+$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class);
+$router->get('/corsi', \Banquet\Actions\Corsi::class);
+
 return $router;

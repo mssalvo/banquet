@@ -3,39 +3,45 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use Banquet\Core\Console\Commands\MakeMapCommand;
-use Banquet\Core\Console\Commands\MakeApiCommand;
-use Banquet\Core\Console\Commands\MakeActionCommand; 
+echo "🚀 Banquet CLI\n\n";
 
-// registra comandi
-$commands = [
-    'make:map' => new MakeMapCommand(),
-    'make:api' => new MakeApiCommand(),
-    'make:action' => new MakeActionCommand()
-];
-
-// input
 $args = $argv;
-array_shift($args);
+array_shift($args); // rimuove script
 
-$inputCommand = $args[0] ?? null;
-$params = array_slice($args, 1);
+$command = $args[0] ?? null;
 
-// help globale
-if (!$inputCommand) {
-    echo "🚀 Banquet CLI\n\n";
-    echo "Comandi disponibili:\n";
-
-    foreach ($commands as $name => $cmd) {
-        echo "  $name\t" . $cmd->getDescription() . "\n";
-    }
-
+if (!$command) {
+    echo "Usage:\n";
+    echo "  banquet generate [options]\n\n";
+    echo "Examples:\n";
+    echo "  banquet generate --table=corsi\n";
+    echo "  banquet generate --action=Corsi --with-view --with-route\n";
     exit;
 }
 
-// esegui comando
-if (isset($commands[$inputCommand])) {
-    $commands[$inputCommand]->handle($params);
-} else {
-    echo "❌ Comando non trovato: $inputCommand\n";
+switch ($command) {
+
+    case 'generate':
+
+        // ricostruisce argomenti CLI
+        $params = implode(' ', array_slice($args, 1));
+
+        $script = __DIR__ . '/generator/generate.php';
+
+        if (!file_exists($script)) {
+            echo "❌ Generator non trovato\n";
+            exit(1);
+        }
+
+        // esegue script originale
+        $cmd = "php \"$script\" $params";
+
+        passthru($cmd, $status);
+
+        exit($status);
+
+    default:
+        echo "❌ Comando non riconosciuto: $command\n\n";
+        echo "Usa:\n";
+        echo "  banquet generate\n";
 }

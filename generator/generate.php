@@ -1,0 +1,1141 @@
+<?php
+/**
+ * Banquet Class Generator
+ *
+ * Genera Entity, DAO, Model e Service per ogni tabella del database,
+ * seguendo le convenzioni del framework Banquet.
+ *
+ * Utilizzo:
+ *   php generator/generate.php
+ *   php generator/generate.php --table=nome_tabella
+ *   php generator/generate.php --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
+ * 
+ * ______________________________________________________________________________
+ *
+ * This file is part of Banquet.
+ *
+ * (c) Salvatore Mariniello <salvo.mariniello@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 1. Configurazione
+// ──────────────────────────────────────────────────────────────────────────────
+
+$BASE_DIR = dirname(__DIR__);
+$SRC_DIR  = $BASE_DIR . '/app/src';
+
+$ENTITY_DIR  = $SRC_DIR . '/Entity';
+$DAO_DIR     = $SRC_DIR . '/Dao';
+$MODEL_DIR   = $SRC_DIR . '/Model';
+$SERVICE_DIR = $SRC_DIR . '/Service';
+$ACTION_DIR  = $SRC_DIR . '/Actions';
+$API_DIR     = $SRC_DIR . '/Actions/Api';
+$VIEW_DIR    = $BASE_DIR . '/app/src/view/pages';
+$ROUTES_FILE = $BASE_DIR . '/app/src/routes/web.php';
+
+// Cerca di caricare la config esistente del progetto
+$configLoaded = false;
+$configFiles = [
+    $BASE_DIR . '/app/src/ms/ms-config.php',
+    $BASE_DIR . '/app/setting/config.php',
+];
+foreach ($configFiles as $f) {
+    if (file_exists($f)) {
+        require_once $f;
+        $configLoaded = true;
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 2. Linea di comando
+// ──────────────────────────────────────────────────────────────────────────────
+
+$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-api:', 'action-view:', 'with-view', 'with-route', 'with-api','class-dao', 'help']);
+$tableFilter = $options['table'] ?? null;
+
+if (isset($options['help'])) {
+    echo <<<HELP
+Banquet Class Generator
+
+Opzioni:
+  --dsn=DSN       DSN di connessione PDO (es. mysql:host=localhost;dbname=test)
+  --user=USER     Username database
+  --pass=PASS     Password database
+  --table=TABELLA Genera solo per una tabella specifica
+  --prefix=PREFIX Prefisso tabella da rimuovere (es. "tbl_")
+   --action=NOME       Genera Action per il Service specificato (es. Corsi)
+   --action-api=NOME   Genera solo la REST Api in Actions/Api/ (es. Corsi)
+   --action-view=NOME  Genera solo la View in view/pages/ (es. Corsi)
+   --with-view         Genera anche la View associata (usato con --action)
+   --with-route        Aggiunge la rotta in web.php (usato con --action)
+   --with-api          Genera anche la REST Api in Actions/Api/ (usato con --action)
+   --class-dao         Genera la abstract class Dao in src/Dao
+   --help              Questo messaggio
+
+Se --dsn non viene fornito, il generatore usa le costanti DB_*
+definite in app/src/ms/ms-config.php.
+
+Esempi:
+   php generator/generate.php
+   php generator/generate.php --table=corsi
+   php generator/generate.php --action=Corsi --with-view --with-route
+   php generator/generate.php --action=Corsi --with-api
+   php generator/generate.php --action=Corsi --with-view --with-route --with-api
+   php generator/generate.php --action-api=Corsi
+   php generator/generate.php --action-view=Corsi
+   php generator/generate.php --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
+   php generator/generate.php --class-dao
+HELP;
+    exit(0);
+}
+
+
+$hasClassAbstractDao = isset($options['class-dao']);
+if ($hasClassAbstractDao) {
+
+        // DAO
+        $code = generateClassAbstactDao();
+        writeFile($DAO_DIR . "/Dao.php", $code);
+        echo "Classe Dao created. ";
+        echo "\n";
+        exit(0);
+}
+
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 3. Connessione al database (solo se necessario)
+// ──────────────────────────────────────────────────────────────────────────────
+
+$hasActionMode = isset($options['action']);
+$hasApiMode    = isset($options['action-api']);
+$hasViewMode   = isset($options['action-view']);
+$hasCustomMode = $hasActionMode || $hasApiMode || $hasViewMode;
+$hasTableMode  = !$hasCustomMode || isset($options['table']);
+
+if ($hasTableMode) {
+    try {
+        if (!empty($options['dsn'])) {
+            $dsn  = $options['dsn'];
+            $user = $options['user'] ?? '';
+            $pass = $options['pass'] ?? '';
+        } elseif (defined('DB_DRIVER')) {
+            $driver = DB_DRIVER;
+            $host   = defined('DB_HOSTNAME') ? DB_HOSTNAME : 'localhost';
+            $port   = defined('DB_PORT')     ? DB_PORT     : '3306';
+            $dbname = defined('DB_DATABASE') ? DB_DATABASE : '';
+            $user   = defined('DB_USERNAME') ? DB_USERNAME : '';
+            $pass   = defined('DB_PASSWORD') ? DB_PASSWORD : '';
+            $sqlite = defined('DB_PATH_DATABASE_SQLITE') ? DB_PATH_DATABASE_SQLITE : '';
+
+            switch ($driver) {
+                case 'mysql':
+                    $dsn = "mysql:host={$host};dbname={$dbname};charset=utf8mb4";
+                    break;
+                case 'pgsql':
+                    $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
+                    break;
+                case 'sqlite':
+                    $dsn = "sqlite:{$sqlite}";
+                    $user = null;
+                    $pass = null;
+                    break;
+                case 'sqlsrv':
+                    $dsn = "sqlsrv:Server={$host};Database={$dbname}";
+                    break;
+                default:
+                    throw new Exception("Driver sconosciuto: {$driver}");
+            }
+        } else {
+            throw new Exception("Nessuna configurazione DB trovata. Usa --dsn o definisci DB_* in ms-config.php");
+        }
+
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ]);
+
+        echo "✓ Connessione al database riuscita\n\n";
+
+    } catch (Exception $e) {
+        echo "✗ ERRORE: " . $e->getMessage() . "\n";
+        exit(1);
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 4. Lettura tabelle
+// ──────────────────────────────────────────────────────────────────────────────
+
+function getTables(PDO $pdo): array
+{
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    switch ($driver) {
+        case 'mysql':
+            $stmt = $pdo->query("SHOW TABLES");
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        case 'pgsql':
+            $stmt = $pdo->query("SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname = 'public'");
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        case 'sqlite':
+            $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'");
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        case 'sqlsrv':
+            $stmt = $pdo->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+            return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        default:
+            throw new Exception("Driver non supportato: {$driver}");
+    }
+}
+
+function getColumns(PDO $pdo, string $table): array
+{
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    switch ($driver) {
+        case 'mysql':
+            $stmt = $pdo->query("SHOW COLUMNS FROM `{$table}`");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        case 'pgsql':
+            $stmt = $pdo->query("
+                SELECT column_name AS \"Field\", data_type AS \"Type\"
+                FROM information_schema.columns
+                WHERE table_name = '{$table}'
+                ORDER BY ordinal_position
+            ");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        case 'sqlite':
+            $stmt = $pdo->query("PRAGMA table_info('{$table}')");
+            $cols = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = [];
+            foreach ($cols as $c) {
+                $result[] = ['Field' => $c['name'], 'Type' => $c['type']];
+            }
+            return $result;
+        case 'sqlsrv':
+            $stmt = $pdo->query("
+                SELECT COLUMN_NAME AS \"Field\", DATA_TYPE AS \"Type\"
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = '{$table}'
+                ORDER BY ORDINAL_POSITION
+            ");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        default:
+            throw new Exception("Driver non supportato: {$driver}");
+    }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 5. Utility di naming
+// ──────────────────────────────────────────────────────────────────────────────
+
+function toPascalCase(string $name, string $prefix = ''): string
+{
+    if ($prefix !== '' && strpos($name, $prefix) === 0) {
+        $name = substr($name, strlen($prefix));
+    }
+
+    $name = trim($name);
+    $name = str_replace(['-', '/'], '_', $name);
+    $name = preg_replace('/[^A-Za-z0-9_]+/', ' ', $name);
+    $name = preg_replace('/_+/', '_', $name);
+    $name = ucwords(str_replace('_', ' ', strtolower($name)));
+    $name = str_replace(' ', '', $name);
+
+    return $name !== '' ? ucfirst($name) : 'Class';
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 6. Generazione Entity
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateEntityCode(string $table, array $columns, string $prefix): string
+{
+    $className  = toPascalCase($table, $prefix);
+    $entityVar  = lcfirst($className);
+    $date       = date('d/m/Y H:i:s');
+    $props      = '';
+    $setBody    = '';
+    $gettersSetters = '';
+    $constants  = "\tconst VAR_CLASSNAME = \"{$className}\";\n";
+
+    foreach ($columns as $col) {
+        $field = $col['Field'];
+        $props .= "\tpublic \${$field};\n";
+        $setBody .= "\t\t\$this->{$field}=isset(\$row[\"{$field}\"])?\$row[\"{$field}\"]:NULL;\n";
+        $constants .= "\tconst COLUMN_" . strtoupper($field) . " = \"{$field}\";\n";
+
+        $methodSuffix = ucfirst($field);
+        $gettersSetters .= <<<PHP
+
+\tpublic function set{$methodSuffix}(\${$field}){
+\t\t\$this->{$field}=\${$field};
+\t}
+
+\tpublic function get{$methodSuffix}(){
+\t\treturn \$this->{$field};
+\t}
+
+PHP;
+    }
+
+    return <<<PHP
+<?php
+namespace Banquet\Entity;
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Entity  {$className}
+ */
+
+class {$className} {
+
+{$props}
+\tpublic function __construct(\$row = NULL)
+\t{
+\t\tif (\$row !== NULL) {
+\t\t\t\$this->_set{$className}(\$row);
+\t\t}
+\t}
+
+\tpublic function _set{$className}(\$row)
+\t{
+{$setBody}\t}
+
+{$gettersSetters}
+{$constants}}
+
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 7. Generazione DAO
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateDaoCode(string $table, array $columns, string $prefix): string
+{
+    $className  = toPascalCase($table, $prefix);
+    $entityVar  = lcfirst($className);
+    $daoClass   = $className . 'Dao';
+    $date       = date('d/m/Y H:i:s');
+
+    $colNames = [];
+    foreach ($columns as $c) {
+        $colNames[] = $c['Field'];
+    }
+    $colList  = implode(",\n\t\t\t\t", $colNames);
+    $placeholders = implode(',', array_fill(0, count($colNames), '?'));
+
+    $idCol = $colNames[0];  // prima colonna = chiave primaria
+
+    $setFields = '';
+    $updateSet = '';
+    foreach ($colNames as $col) {
+        $setFields .= "\$this->{$entityVar}->{$col},";
+        if ($col !== $idCol) {
+            $updateSet .= "\t\t\t\t{$col} = ?,\n";
+        }
+    }
+    $setFields = rtrim($setFields, ',');
+    // UPDATE set: exclude PK from SET, add PK at end for WHERE
+    $updateSetCols = [];
+    $updateParams = [];
+    foreach ($colNames as $col) {
+        $updateSetCols[] = "\t\t\t\t{$col} = ?";
+        $updateParams[] = "\$this->{$entityVar}->{$col}";
+    }
+    $updateSetStr = implode(",\n", $updateSetCols);
+    $updateParamsStr = implode(',', $updateParams) . ",\$this->{$entityVar}->{$idCol}";
+
+    $selectCols = implode(', ', $colNames);
+    // per SELECT * uso direttamente *
+    $selectAll = '*';
+    // Inserisco anche l'id nella INSERT (come fanno i DAO esistenti)
+    $insertCols = $colList;
+    $insertVals = $placeholders;
+
+    return <<<PHP
+<?php
+namespace Banquet\Dao;
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Dao  {$className}
+ */
+
+use Banquet\Entity\\{$className};
+use Banquet\Dao\Dao;
+
+class {$daoClass} extends Dao {
+\tprivate \${$entityVar};
+
+\tpublic function __construct({$className} \${$entityVar}) {
+\t\t\$this->{$entityVar}=\${$entityVar};
+\t}
+
+\tpublic function set{$className}({$className} \${$entityVar}) {
+\t\t\$this->{$entityVar}=\${$entityVar};
+\t}
+
+\tpublic function save() {
+\t\t\$sql = "INSERT INTO {$table}
+\t\t\t({$insertCols})
+\t\t\t VALUES
+\t\t\t({$insertVals});";
+
+\t\t\$this->query(\$sql,[{$setFields}]);
+
+\t\treturn true;
+\t}
+
+\tpublic function update() {
+\t\t\$sql = "UPDATE {$table}
+\t\t\tSET
+{$updateSetStr}
+\t\t\t WHERE
+\t\t\t{$idCol} = ?;";
+
+\t\t\$this->query(\$sql,[{$updateParamsStr}]);
+
+\t\treturn true;
+\t}
+
+\tpublic function delete() {
+\t\t\$sql = "DELETE FROM {$table} WHERE {$idCol} = ?;";
+\t\t\$this->query(\$sql,[\$this->{$entityVar}->{$idCol}]);
+
+\t\treturn true;
+\t}
+
+\tpublic function getFind(\${$idCol}) {
+\t\t\$sql = "SELECT * FROM {$table} WHERE {$idCol} = ?;";
+\t\t\$result = \$this->fetchRow(\$sql, [\${$idCol}]);
+
+\t\tif (\$result && is_array(\$result)) {
+\t\t\treturn \$result;
+\t\t}
+
+\t\treturn [];
+\t}
+
+\tpublic function getFindAll() {
+\t\t\$sql = "SELECT * FROM {$table}";
+\t\t\$result = \$this->fetchAll(\$sql);
+
+\t\tif (\$result && is_array(\$result)) {
+\t\t\treturn \$result;
+\t\t}
+
+\t\treturn [];
+\t}
+
+\tpublic function getAllObject() {
+\t\t\$sql = "SELECT * FROM {$table}";
+\t\t\$rows = \$this->fetchAll(\$sql);
+
+\t\tif (is_array(\$rows)) {
+\t\t\treturn array_map(function (\$row) {
+\t\t\t\treturn new {$className}(\$row);
+\t\t\t}, \$rows);
+\t\t}
+
+\t\treturn null;
+\t}
+
+\tpublic function getObject(\${$idCol}) {
+\t\t\$sql = "SELECT * FROM {$table} WHERE {$idCol} = ?;";
+\t\t\$rows = \$this->fetchRow(\$sql, [\${$idCol}]);
+
+\t\tif (is_array(\$rows)) {
+\t\t\treturn new {$className}(\$rows);
+\t\t}
+
+\t\treturn null;
+\t}
+
+\tpublic function getLastInsertId() {
+\t\treturn \$this->lastInsertId();
+\t}
+
+}
+
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 8. Generazione Model
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateModelCode(string $table, array $columns, string $prefix): string
+{
+    $className  = toPascalCase($table, $prefix);
+    $entityVar  = lcfirst($className);
+    $modelClass = $className . 'Model';
+    $daoClass   = $className . 'Dao';
+    $date       = date('d/m/Y H:i:s');
+
+    return <<<PHP
+<?php
+namespace Banquet\Model;
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Model  {$className}
+ */
+
+use Banquet\Entity\\{$className};
+use Banquet\Dao\\{$daoClass};
+
+class {$modelClass} extends {$daoClass} {
+\tprivate \${$entityVar};
+
+\tpublic function __construct({$className} \${$entityVar}) {
+\t\t\$this->{$entityVar}=\${$entityVar};
+\t\tparent::__construct(\${$entityVar});
+\t}
+}
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 9. Generazione Service
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateServiceCode(string $table, array $columns, string $prefix): string
+{
+    $className   = toPascalCase($table, $prefix);
+    $entityVar   = lcfirst($className);
+    $serviceClass = $className . 'Service';
+    $modelClass  = $className . 'Model';
+    $getAllMethod = 'getAll' . $className;
+    $getByIdMethod = 'get' . $className . 'ById';
+    $date        = date('d/m/Y H:i:s');
+
+    return <<<PHP
+<?php
+namespace Banquet\Service;
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Service  {$className}
+ */
+
+use Banquet\Entity\\{$className};
+use Banquet\Model\\{$modelClass};
+
+class {$serviceClass} {
+\tprivate \$model;
+
+\tpublic function __construct({$modelClass} \$model) {
+\t\t\$this->model=\$model;
+\t}
+
+\tpublic function salva({$className} \${$entityVar}){
+\t\t\$this->model->set{$className}(\${$entityVar});
+\t\t\$this->model->save();
+\t}
+
+\tpublic function update({$className} \${$entityVar}){
+\t\t\$this->model->set{$className}(\${$entityVar});
+\t\t\$this->model->update();
+\t}
+
+\tpublic function delete({$className} \${$entityVar}){
+\t\t\$this->model->set{$className}(\${$entityVar});
+\t\t\$this->model->delete();
+\t}
+
+\tpublic function {$getAllMethod}(){
+\t\treturn \$this->model->getAllObject();
+\t}
+
+\tpublic function {$getByIdMethod}(\$id){
+\t\treturn \$this->model->getObject(\$id);
+\t}
+
+\tpublic function getLastInsertId() {
+\t\treturn \$this->model->getLastInsertId();
+\t}
+
+}
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 10. Generazione Action
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateActionCode(string $className): string
+{   $className  = toPascalCase($className, '');
+    $entityVar  = lcfirst($className);
+    $serviceClass = $className . 'Service';
+    $routeName  = strtolower($entityVar);
+    $date       = date('d/m/Y H:i:s');
+
+    return <<<PHP
+<?php
+
+namespace Banquet\Actions;
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Action  {$className}
+ */
+
+use Banquet\Core\SenderAction;
+use Banquet\Service\\{$serviceClass};
+
+class {$className} extends SenderAction{
+    private \$service;
+    public function __construct({$serviceClass} \$service) {
+        \$this->service=\$service;
+    }
+
+    public function send() {
+         \$this->setTemplateName("pages/{$routeName}");
+
+         \$this->varAdd("{$entityVar}", \$this->service->getAll{$className}());
+
+        return \$this->getTemplate("default");
+    }
+}
+
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 11. Generazione View
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateViewCode(string $className): string
+{
+    $entityVar  = lcfirst($className);
+    $routeName  = strtolower($entityVar);
+
+    return <<<PHP
+<a href="/{$routeName}/create">Nuovo</a>
+
+<ul>
+<?php foreach (\${$entityVar} as \${$entityVar}Item): ?>
+    <li>
+        <?= \${$entityVar}Item->id ?>
+        <a href="/{$routeName}/edit/<?= \${$entityVar}Item->id ?>">Edit</a>
+        <a href="/{$routeName}/delete/<?= \${$entityVar}Item->id ?>">Delete</a>
+    </li>
+<?php endforeach; ?>
+</ul>
+
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 12. Generazione REST Api
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateApiCode(string $className): string
+{
+    $className  = toPascalCase($className, '');
+    $entityVar    = lcfirst($className);
+    $serviceClass = $className . 'Service';
+    $apiClass     = $className . 'Rest';
+    $getByIdMethod = 'get' . $className . 'ById';
+    $getAllMethod  = 'getAll' . $className;
+    $date         = date('d/m/Y H:i:s');
+
+    return <<<PHP
+<?php
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Api-Rest  {$className}
+ */
+
+namespace Banquet\Actions\Api;
+use Banquet\Core\SenderAction;
+use Banquet\Service\\{$serviceClass};
+use Banquet\Entity\\{$className};
+
+class {$apiClass} extends SenderAction
+{
+    private \$service;
+    public function __construct({$serviceClass} \$service) {
+        \$this->service=\$service;
+    }
+    public function send()
+    {
+        \$this->setTemplateName("pages/json");
+
+
+        switch (\$this->getRequestMethod()) {
+
+            case 'GET':
+                \$data = \$this->route('id')
+                    ? \$this->service->{$getByIdMethod}(\$this->route('id'))
+                    : \$this->service->{$getAllMethod}();
+                      \$this->varAdd("json", json_encode(\$data));
+                break;
+
+                case 'POST':
+                \$body = json_decode(file_get_contents('php://input'), true);
+                \$entity = new {$className}(\$body);
+                \$this->service->salva(\$entity);
+                \$data = ['success' => true, 'id' => \$this->service->getLastInsertId()];
+                \$this->varAdd("json", json_encode(\$data));
+                break;
+
+                case 'PUT':
+                \$body = json_decode(file_get_contents('php://input'), true);
+                \$entity = new {$className}(\$body);
+                \$this->service->update(\$entity);
+                \$data = ['success' => true, 'id' => \$entity->id];
+                \$this->varAdd("json", json_encode(\$data));
+                break;
+
+                case 'DELETE':
+                \$data = array();
+                \$data['id']= \$this->route('id');
+                \$this->service->delete(new {$className}(\$data));
+                \$row = \$this->service->{$getByIdMethod}(\$this->route('id'));
+                \$dataJson =\$row? ['success' => false, 'id' => \$this->route('id')] : ['success'=> true,'id'=> \$this->route('id')];
+                \$this->varAdd("json", json_encode(\$dataJson));
+                break;
+
+                default:
+                \$data = ['error' => 'Method not allowed', 'method'=>\$this->getRequestMethod()] ;
+                   \$this->varAdd("json", json_encode(\$data));
+        }
+
+
+            \$this->getResponse()->addHeader('Content-Type: application/json');
+
+            return \$this->getTemplate('empty');
+    }
+}
+
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 13. Aggiunta Route REST Api
+// ──────────────────────────────────────────────────────────────────────────────
+
+function addApiRoutes(string $className): bool
+{
+    global $ROUTES_FILE;
+    $routeName = strtolower(lcfirst($className));
+    $apiClass  = '\\Banquet\\Actions\\Api\\' . $className . 'Rest::class';
+
+    $routeAll  = "\$router->get('/api/{$routeName}', {$apiClass});";
+    $routeById = "\$router->get('/api/{$routeName}/{id}', {$apiClass});";
+    $routePost  = "\$router->post('/api/{$routeName}', {$apiClass});";
+    $routePut  = "\$router->put('/api/{$routeName}', {$apiClass});";
+    $routeDelete  = "\$router->delete('/api/{$routeName}/{id}', {$apiClass});";
+
+    if (!file_exists($ROUTES_FILE)) {
+        echo "  ✗ File routes non trovato: {$ROUTES_FILE}\n";
+        return false;
+    }
+
+    $content = file_get_contents($ROUTES_FILE);
+
+    if (strpos($content, $routeAll) !== false) {
+        echo "  ∼ Route Api già presente in web.php\n";
+        return true;
+    }
+    if (strpos($content, $routePost) !== false) {
+        echo "  ∼ Route Api post già presente in web.php\n";
+        return true;
+    }
+    if (strpos($content, $routePut) !== false) {
+        echo "  ∼ Route Api put già presente in web.php\n";
+        return true;
+    }
+    if (strpos($content, $routeDelete) !== false) {
+        echo "  ∼ Route Api delete già presente in web.php\n";
+        return true;
+    }
+
+    $newRoutes = "\n{$routeAll}\n{$routeById}\n{$routePost}\n{$routePut}\n{$routeDelete}\n";
+
+    $newContent = str_replace(
+        "return \$router;",
+        $newRoutes . "return \$router;",
+        $content
+    );
+
+    if ($newContent === $content) {
+        echo "  ✗ Impossibile trovare 'return \$router;' in web.php\n";
+        return false;
+    }
+
+    file_put_contents($ROUTES_FILE, $newContent);
+    echo "  ✓ Route Api aggiunte in web.php\n";
+    echo  $newRoutes;
+
+    return true;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 14. Aggiunta Route
+// ──────────────────────────────────────────────────────────────────────────────
+
+function addRouteEntry(string $className): bool
+{
+    global $ROUTES_FILE;
+    $routeName = strtolower(lcfirst($className));
+    $actionFqcn = '\\Banquet\\Actions\\' . $className . '::class';
+    $routeLine = "\$router->get('/{$routeName}', \\Banquet\\Actions\\{$className}::class);";
+
+    if (!file_exists($ROUTES_FILE)) {
+        echo "  ✗ File routes non trovato: {$ROUTES_FILE}\n";
+        return false;
+    }
+
+    $content = file_get_contents($ROUTES_FILE);
+
+    // Check if route already exists
+    if (strpos($content, $routeLine) !== false) {
+        echo "  ∼ Rotta già presente in web.php\n";
+        return true;
+    }
+
+    // Insert before "return $router;"
+    $newContent = str_replace(
+        "return \$router;",
+        $routeLine . "\n\nreturn \$router;",
+        $content
+    );
+
+    if ($newContent === $content) {
+        echo "  ✗ Impossibile trovare 'return \$router;' in web.php\n";
+        return false;
+    }
+
+    file_put_contents($ROUTES_FILE, $newContent);
+    return true;
+}
+
+function generateClassAbstactDao(): string
+{
+
+    $date = date('d/m/Y H:i:s');
+
+   return <<<PHP
+<?php
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @author Salvatore Mariniello
+ * @copyright MIT
+ */
+
+namespace Banquet\Dao;
+
+use Banquet\Driver\PDODriver;
+
+
+abstract class Dao {
+
+    abstract protected function save();
+
+    abstract protected function update();
+
+    abstract protected function delete();
+
+    abstract protected function getObject(\$id);
+
+    abstract protected function getAllObject();
+
+    abstract protected function getFindAll();
+
+    abstract protected function getFind(\$id);
+
+    protected function getDriver(): PDODriver
+    {
+        return PDODriver::getDriver();
+    }
+
+    protected function query(string \$sql, array \$params = [])
+    {
+        return \$this->getDriver()->query(\$sql, \$params);
+    }
+
+    protected function fetchRow(string \$sql, array \$params = [])
+    {
+        return \$this->getDriver()->fetchRow(\$sql, \$params);
+    }
+
+    protected function fetchAll(string \$sql, array \$params = [])
+    {
+        return \$this->getDriver()->fetchAll(\$sql, \$params);
+    }
+
+    protected function lastInsertId()
+    {
+        return \$this->getDriver()->lastInsertId();
+    }
+
+
+    public function report_find_xml(\$id) {
+
+        return \$this->define_report_xml(\$this->getFind(\$id));
+    }
+
+    public function report_find_json(\$id) {
+
+        return \$this->define_report_json(\$this->getFind(\$id));
+    }
+
+    public function report_all_xml() {
+
+        return \$this->define_report_xml(\$this->getFindAll());
+    }
+
+    public function report_all_json() {
+
+        return \$this->define_report_json(\$this->getFindAll());
+    }
+
+    public function report_find_html_table(\$id) {
+
+        return \$this->define_report_html_table(\$this->getFind(\$id));
+    }
+
+    public function report_html_table() {
+
+        return \$this->define_report_html_table(\$this->getFindAll());
+    }
+
+    public function report_html_select(\$propertyObject) {
+
+        return \$this->define_report_html_select(\$this->getFindAll(), \$propertyObject);
+    }
+
+    protected function define_report_xml(\$rows) {
+
+        return util_report_xml(\$rows);
+    }
+
+    protected function define_report_json(\$rows) {
+
+        return util_report_json(\$rows);
+    }
+
+    protected function define_report_html_table(\$rows) {
+
+        return util_report_html_table(\$rows);
+    }
+
+    protected function define_report_html_select(\$rows, \$property) {
+
+        return util_report_html_select(\$rows, \$property);
+    }
+
+
+}
+
+?>
+
+PHP;
+}
+
+
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 15. Scrittura file
+// ──────────────────────────────────────────────────────────────────────────────
+
+function writeFile(string $path, string $content): void
+{
+    $dir = dirname($path);
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    file_put_contents($path, $content);
+    echo "  ✓ " . basename($path) . "\n";
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 16. Main
+// ──────────────────────────────────────────────────────────────────────────────
+
+$created = []; // per il riepilogo finale
+
+if ($hasTableMode) {
+    $prefix = $options['prefix'] ?? '';
+    $tables = getTables($pdo);
+
+    if ($tableFilter) {
+        $tables = array_filter($tables, function($t) use ($tableFilter) { return $t === $tableFilter; });
+        if (empty($tables)) {
+            echo "✗ Tabella '{$tableFilter}' non trovata.\n";
+            exit(1);
+        }
+    }
+
+    echo "Tabelle trovate: " . implode(', ', $tables) . "\n\n";
+
+    foreach ($tables as $table) {
+        echo "━━━ {$table} ━━━\n";
+
+        $columns = getColumns($pdo, $table);
+        $fieldList = [];
+        foreach ($columns as $c) {
+            $fieldList[] = $c['Field'];
+        }
+        echo "  Colonne: " . implode(', ', $fieldList) . "\n";
+
+        // Entity
+        $className = toPascalCase($table, $prefix);
+        $code = generateEntityCode($table, $columns, $prefix);
+        writeFile($ENTITY_DIR . "/{$className}.php", $code);
+        $created[] = ['type' => 'Entity', 'path' => $ENTITY_DIR . "/{$className}.php", 'name' => $className];
+
+        // DAO
+        $code = generateDaoCode($table, $columns, $prefix);
+        writeFile($DAO_DIR . "/{$className}Dao.php", $code);
+        $created[] = ['type' => 'DAO', 'path' => $DAO_DIR . "/{$className}Dao.php", 'name' => $className];
+
+        // Model
+        $code = generateModelCode($table, $columns, $prefix);
+        writeFile($MODEL_DIR . "/{$className}Model.php", $code);
+        $created[] = ['type' => 'Model', 'path' => $MODEL_DIR . "/{$className}Model.php", 'name' => $className];
+
+        // Service
+        $code = generateServiceCode($table, $columns, $prefix);
+        writeFile($SERVICE_DIR . "/{$className}Service.php", $code);
+        $created[] = ['type' => 'Service', 'path' => $SERVICE_DIR . "/{$className}Service.php", 'name' => $className];
+
+        echo "\n";
+    }
+}
+
+
+
+if ($hasActionMode) {
+    $actionName = $options['action'];
+    $actionName  = toPascalCase($actionName, '');
+    $actionName = preg_replace('/Service$/', '', $actionName);
+    $entityVar = lcfirst($actionName);
+    $routeName = strtolower($entityVar);
+    $withView  = isset($options['with-view']);
+    $withRoute = isset($options['with-route']);
+
+    $withApi   = isset($options['with-api']);
+
+    echo "━━━ Action: {$actionName} ━━━\n";
+
+    // Action
+    $code = generateActionCode($actionName);
+    writeFile($ACTION_DIR . "/{$actionName}.php", $code);
+    $created[] = ['type' => 'Action', 'path' => $ACTION_DIR . "/{$actionName}.php", 'name' => $actionName];
+
+    // REST Api
+    if ($withApi) {
+        $code = generateApiCode($actionName);
+        writeFile($API_DIR . "/{$actionName}Rest.php", $code);
+        $created[] = ['type' => 'Api', 'path' => $API_DIR . "/{$actionName}Rest.php", 'name' => $actionName];
+
+        if (addApiRoutes($actionName)) {
+            $created[] = ['type' => 'Route', 'path' => $ROUTES_FILE, 'name' => '/api/' . $routeName];
+        }
+    }
+
+    // View
+    if ($withView) {
+        $code = generateViewCode($actionName);
+        writeFile($VIEW_DIR . "/{$routeName}.php", $code);
+        $created[] = ['type' => 'View', 'path' => $VIEW_DIR . "/{$routeName}.php", 'name' => $actionName];
+    }
+
+    // Route
+    if ($withRoute) {
+        if (addRouteEntry($actionName)) {
+            $created[] = ['type' => 'Route', 'path' => $ROUTES_FILE, 'name' => '/' . $routeName];
+        }
+    }
+
+    echo "\n";
+}
+
+// ─── action-api mode ───
+if ($hasApiMode) {
+    $apiName = $options['action-api'];
+    $apiName = toPascalCase($apiName, '');
+    $apiName = preg_replace('/Service$/', '', $apiName);
+    $entityVar = lcfirst($apiName);
+    $routeName = strtolower($entityVar);
+
+    echo "━━━ API: {$apiName} ━━━\n";
+
+    $code = generateApiCode($apiName);
+    writeFile($API_DIR . "/{$apiName}Rest.php", $code);
+    $created[] = ['type' => 'Api', 'path' => $API_DIR . "/{$apiName}Rest.php", 'name' => $apiName];
+
+    if (addApiRoutes($apiName)) {
+        $created[] = ['type' => 'Route', 'path' => $ROUTES_FILE, 'name' => '/api/' . $routeName];
+    }
+
+    echo "\n";
+}
+
+// ─── action-view mode ───
+if ($hasViewMode) {
+    $viewName = $options['action-view'];
+    $viewName = toPascalCase($viewName, '');
+    $viewName = preg_replace('/Service$/', '', $viewName);
+    $entityVar = lcfirst($viewName);
+    $routeName = strtolower($entityVar);
+
+    echo "━━━ View: {$viewName} ━━━\n";
+
+    $code = generateViewCode($viewName);
+    writeFile($VIEW_DIR . "/{$routeName}.php", $code);
+    $created[] = ['type' => 'View', 'path' => $VIEW_DIR . "/{$routeName}.php", 'name' => $viewName];
+
+    echo "\n";
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 17. Riepilogo finale
+// ──────────────────────────────────────────────────────────────────────────────
+
+if (!empty($created)) {
+    echo "═══════════════════════════════════════════════════════════════\n";
+    echo "                     RIEPILOGO CREAZIONE                      \n";
+    echo "═══════════════════════════════════════════════════════════════\n";
+
+    foreach ($created as $item) {
+        $label = str_pad($item['type'], 8, ' ', STR_PAD_RIGHT);
+        echo "  {$label} → " . $item['path'] . "\n";
+    }
+
+    echo "───────────────────────────────────────────────────────────────\n";
+
+    // Stampa le URL per le Action create
+    $actionRoutes = array_filter($created, function($i) { return $i['type'] === 'Action'; });
+    if (!empty($actionRoutes)) {
+        echo "  URL azioni generate:\n";
+        foreach ($actionRoutes as $item) {
+            $routeName = strtolower(lcfirst($item['name']));
+            echo "    ● GET /{$routeName}  →  http://localhost:8000/{$routeName}\n";
+        }
+    }
+
+    echo "═══════════════════════════════════════════════════════════════\n";
+}
+
+echo "✔ Generazione completata.\n";
