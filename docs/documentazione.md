@@ -288,7 +288,7 @@ Puoi estendere `runMiddleware()` in `app/src/Core/Router.php` per altri middlewa
 
 ## 7. Generatore automatico
 
-Lo script `banquet generate` crea classi e file base per il progetto.
+Lo script `banquet make:map` crea classi e file base per il progetto.
 
 ### Opzioni principali
 
@@ -312,12 +312,13 @@ Lo script `banquet generate` crea classi e file base per il progetto.
 ### Esempi di comando
 
 ```bash
-php banquet generate
-php banquet generate --table=corsi
-php banquet generate --action=Corsi --with-view --with-route
-php banquet generate --action=Corsi --with-api
-php banquet generate --action=Corsi --with-view --with-route --with-api
-php banquet generate --class-dao
+php banquet make:map all
+php banquet make:map corsi
+php banquet make:action Corsi  
+php banquet make:api Corsi  
+php banquet make:map Corsi full-action
+php banquet --class-dao
+php banquet --help
 ```
 
 ### Esempio di Action generata

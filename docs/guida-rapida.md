@@ -151,8 +151,8 @@ php banquet make:api Iscrizione
 Le route saranno disponibili come:
 
 ```text
-/api/iscrizione
-/api/iscrizione/{id}
+GET/POST/PUT  /api/iscrizione
+GET/DELETE   /api/iscrizione/{id}
 ```
 
 ## 11. Consigli utili
