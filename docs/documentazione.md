@@ -72,8 +72,10 @@ banquet/
 │       ├── Driver/
 │       ├── routes/
 │       └── view/
-└── generator/
-    └── generate.php
+└── bin/
+│  
+│      
+└── banquet     
 ```
 
 ---
@@ -108,10 +110,13 @@ Esegue:
 ### Comandi principali
 
 ```bash
-php banquet generate              # genera Entity/DAO/Model/Service per tutte le tabelle
-php banquet generate --table=corsi  # genera solo per la tabella specificata
-php banquet generate --action=Corsi --with-view --with-route  # genera Action + view + route
-php banquet generate --action=Corsi --with-api  # genera API REST per Corsi
+php banquet make:map all               # genera Entity/DAO/Model/Service per tutte le tabelle
+php banquet make:map all --prefix=tbl_ # genera Entity/DAO/Model/Service per tutte le tabelle elimina il prefisso
+php banquet make:map corsi    # genera solo per la tabella specificata
+php banquet make:map corsi full-action  # genera Entity/DAO/Model/Service + Action + view + route + Api
+php banquet make:action corsi       # Action + view + route
+php banquet make:action <nome-action> <nome-service> # Action associa il Service indicato + view + route
+php banquet make:api corsi   # genera API REST per Corsi
 php banquet generate --class-dao  # genera la classe astratta Dao
 ```
 
@@ -292,17 +297,17 @@ Lo script `banquet generate` crea classi e file base per il progetto.
 - `--pass=PASS`
 - `--table=TABELLA`
 - `--prefix=PREFIX`
-- `--action=NOME`
-- `--with-view`
-- `--with-route`
-- `--with-api`
+- `--not-view`
+- `--not-route`
 - `--class-dao`
 - `--help`
 
 ### Cosa genera
 
-- Senza `--action`: `Entity`, `Dao`, `Model`, `Service`
-- Con `--action=NOME`: `Action`, opzionale `View`, opzionale `Route`, opzionale `API`
+- Senza `--not-view`: `Action`, `View`, `Route`
+- Con `--not-view`: `Action`,  `Route`
+- Senza `--not-route`: `Action`, `View`, `Route`
+- Con `--not-route`: `Action`, `View`
 
 ### Esempi di comando
 
@@ -394,8 +399,8 @@ class CorsiRest extends SenderAction
 
 ### Rotte generate automaticamente
 
-- `--with-route` aggiunge `GET /corsi` in `app/src/routes/web.php`
-- `--with-api` aggiunge `GET /api/corsi` e `GET /api/corsi/{id}`
+- `make:action` aggiunge `GET /corsi` in `app/src/routes/web.php`
+- `make:api` aggiunge `GET /api/corsi` e `GET /api/corsi/{id}`
 
 ---
 

@@ -90,7 +90,7 @@ Questo genera:
 ## 7. Genera anche l'API REST
 
 ```bash
-php banquet generate --action=Corsi --with-view --with-route --with-api
+php banquet make:map corsi full-action
 ```
 
 Questo genera anche:
@@ -117,7 +117,7 @@ http://localhost:8000/home
 ### Step 1: genera l'Action
 
 ```bash
-php banquet generate --action=Prodotti --with-view --with-route
+php banquet make:action Prodotti
 ```
 
 ### Step 2: apri la rotta generata
@@ -145,7 +145,7 @@ Aggiungi il markup HTML che desideri.
 Per una tabella chiamata `iscrizione`:
 
 ```bash
-php banquet generate --action=Iscrizione --with-api
+php banquet make:api Iscrizione
 ```
 
 Le route saranno disponibili come:
