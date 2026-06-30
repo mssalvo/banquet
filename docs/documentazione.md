@@ -401,7 +401,7 @@ class CorsiRest extends SenderAction
 ### Rotte generate automaticamente
 
 - `make:action` aggiunge `GET /corsi` in `app/src/routes/web.php`
-- `make:api` aggiunge `GET /api/corsi` e `GET /api/corsi/{id}`
+- `make:api` aggiunge `GET/POST/PUT  /api/corsi` e `GET/DELETE  /api/corsi/{id}`
 
 ---
 
