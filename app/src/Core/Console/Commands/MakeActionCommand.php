@@ -27,8 +27,29 @@ class MakeActionCommand extends Command
         if ($hasNotRoute) {
          $stringParam= str_replace('--with-route', '', $stringParam);
         }
+        $hasApi = isset($arra_associativo['with-api']);
+        if ($hasApi) {
+         $stringParam= $stringParam . ' --with-api';
+        }
+
+        $service =  null;
+        $hasActionService = isset($arra_associativo['action-service']);
+        if ($hasActionService) {
+         $service = $arra_associativo['action-service'] ?? null;
+        }
+
+        $hasTable = isset($arra_associativo['table']);
+       if ($hasTable) {
+         $stringParam= $stringParam . ' --table='.$arra_associativo['table'] ?? '';
+        }
+        
+
         $action = $args[0] ?? null;
-        $service = $args[1] ?? null;
+        
+
+    
+
+
         if (!$action) {
             echo "❌ Specifica una tabella\n";
             return;
@@ -41,9 +62,13 @@ class MakeActionCommand extends Command
             echo "✅ Procedo alla creazione della singola action: $action\n";
             passthru("php bin/generate --action=$action --with-service $stringParam");
         } elseif ($service != null && $this->checkExist($service)) {
-            echo "✅ Procedo alla creazione action: $action con service\n";
+            echo "✅ Procedo alla creazione action: $action con service1\n";
             passthru("php bin/generate --action=$action --action-service=$service --with-service $stringParam");
-        } else {
+        } elseif ($service != null && $hasTable) {
+            echo "✅ Procedo alla creazione action: $action con service2\n";
+            passthru("php bin/generate --action=$action --action-service=$service --with-service $stringParam");
+        } 
+        else {
             echo "✅ Procedo alla creazione action: $action\n";
             passthru("php bin/generate --action=$action $stringParam");
         }

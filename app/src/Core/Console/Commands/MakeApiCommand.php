@@ -32,21 +32,33 @@ class MakeApiCommand extends Command
         if ($hasPrefix) {
          $stringPrefix=' --prefix='.$arra_associativo['prefix'] ?? '';
         }
+
+        $service =  null;
+        $hasActionService = isset($arra_associativo['action-service']);
+        if ($hasActionService) {
+         $service = $arra_associativo['action-service'] ?? '';
+        $stringPrefix=$stringPrefix.' --action-service='.$service;
+        }
+
         $table = $args[0] ?? null;
 
         if (!$table) {
             echo "❌ Specifica una tabella\n";
             return;
         }
-    if($this->checkExists($table)) {
+
+       $serviceClass = ($service ?? $table);
+       $serviceClass = preg_replace('/Service$/', '', $serviceClass);
+
+    if(!$hasActionService &&$this->checkExists($table)) {
     echo "✅ File Esiste\n";    
     passthru("php bin/generate --action-api=$table");
     } else {
          echo "❌ File non esistono\n";
        if($hasDns) {
-         passthru("php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$table $stringPrefix --action-api=$table");
+         passthru("php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$serviceClass $stringPrefix --action-api=$table");
        } else {
-         passthru("php bin/generate --table=$table $stringPrefix --action-api=$table");
+         passthru("php bin/generate --table=$serviceClass $stringPrefix --action-api=$table");
        }
     }
 
@@ -79,11 +91,13 @@ $classe = $this->toPascalCase($name);
 
  
 $configLoaded = false;
+$controlFiles= [];
+ 
 $configFiles = [
     $ENTITY_DIR . '/'.$classe.'.php',
-    $SERVICE_DIR . '/'.$classe.'Service.php',
     $DAO_DIR . '/'.$classe.'Dao.php',
-    $MODEL_DIR . '/'.$classe.'Model.php'
+    $MODEL_DIR . '/'.$classe.'Model.php',
+    $SERVICE_DIR . '/'.$classe.'Service.php'
 ];
 
  
@@ -91,15 +105,20 @@ $configFiles = [
 foreach ($configFiles as $f) {
    
 if (file_exists($f)) {
-        $configLoaded = true;
-        
+    
+    $controlFiles[]=true;
+    
     }
+
 }
+
+$configLoaded = count($controlFiles) === count($configFiles);
+
 
 return $configLoaded;
 
+
+
 }
-
-
 
 }

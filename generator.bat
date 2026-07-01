@@ -1,2 +1,2 @@
 @echo off
-php banquet generate %*
+php banquet %*

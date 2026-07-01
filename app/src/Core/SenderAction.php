@@ -70,12 +70,11 @@ abstract class SenderAction{
     }
 
     public function getParameter($param) {
-       if(isset($_REQUEST[$param]))
-           return $_REQUEST[$param];
-       else if(Factory::getParameter($param)!=NULL)
-           return Factory::getParameter($param);
-       else
-           return NULL;
+       if(isset($_REQUEST[$param])){
+        return $_REQUEST[$param];   
+       }
+       
+       return NULL;
 
     }
     
