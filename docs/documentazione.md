@@ -1,4 +1,4 @@
-# Documentazione Framework Banquet
+# Documentazione Banquet Tool
 
 Banquet è uno strumento PHP che accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route) a partire dal database.<br>
 
