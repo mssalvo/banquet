@@ -22,7 +22,17 @@
  
 ---
 
+
+### 💙 Banquet
+
+**Rapid PHP Development Tool**
+
+> Meno configurazione. Più sviluppo. Più libertà. Più PHP.
+
+
+
 ## 🚀 Installazione
+
 
 ```bash
 composer create-project mssalvo/banquet my-app
@@ -159,12 +169,6 @@ Vuole fare esattamente il contrario:
 ✅ aiutarti a trasformare idee in applicazioni reali
 
 **Se hai la voglia di creare e la fantasia di immaginare, Banquet ti fornisce tutto il resto.**
-
-### ⚡ Banquet
-
-**Rapid PHP Development Tool**
-
-> Meno configurazione. Più sviluppo. Più libertà. Più PHP.
 
 
 
@@ -505,3 +509,5 @@ Configura il database in `app/src/ms/ms-config.php` e via.
 <p align="center">
   <sub>Built with ❤️ for PHP developers who value simplicity and productivity.</sub>
 </p>
+
+ 
