@@ -25,9 +25,8 @@
 
 ### 💙 Banquet
 
-**Rapid PHP Development Tool**
+> Meno configurazione > Nessuna dipendenza > Più libertà > Più PHP
 
-> Meno configurazione. Più sviluppo. Più libertà. Più PHP.
 
 
 
