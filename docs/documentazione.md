@@ -127,10 +127,12 @@ php banquet make:map all               # genera Entity/DAO/Model/Service per tut
 php banquet make:map all --prefix=tbl_ # genera Entity/DAO/Model/Service per tutte le tabelle elimina il prefisso
 php banquet make:map corsi    # genera solo per la tabella specificata
 php banquet make:map corsi full-action  # genera Entity/DAO/Model/Service + Action + view + route + Api
-php banquet make:action corsi       # Action + view + route
-php banquet make:action <nome-action> <nome-service> # Action associa il Service indicato + view + route
+php banquet make:action corsi       # Action + view + route se presente il service corsi verrà iniettato nel costruttore altrimenti genera action senza dipendenza
+php banquet make:action <nome-action> --action-service=<nome-service> # Action associa il Service + view + route. Verrà iniettato nel costruttore lo specifico service <nome-service>
+php banquet make:action <nome-action> --table=<nome-action> # se non esiste il service recupera dal database la tabella e ricrea la struttura Entity,Dao,Model,Service
 php banquet make:api corsi   # genera API REST per Corsi
-php banquet generate --class-dao  # genera la classe astratta Dao
+php banquet make:api <nome-api>   --action-service=<service> # genera API REST per nome-api ed inietta <service> 
+php banquet generate --class-dao  # genera la classe astratta Dao / se si cancella per errore
 ```
 
 ### Percorsi utili
