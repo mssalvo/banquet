@@ -311,6 +311,7 @@ Lo script `banquet make:map` crea classi e file base per il progetto.
 - `--user=USER`
 - `--pass=PASS`
 - `--table=TABELLA`
+- `--action-service=SERVICE`
 - `--prefix=PREFIX`
 - `--not-view`
 - `--not-route`
@@ -329,9 +330,14 @@ Lo script `banquet make:map` crea classi e file base per il progetto.
 ```bash
 php banquet make:map all
 php banquet make:map corsi
-php banquet make:action Corsi  
-php banquet make:api Corsi  
-php banquet make:map Corsi full-action
+php banquet make:map corsi full-action
+php banquet make:action corsi  
+php banquet make:action corsi  --table=corsi
+php banquet make:action CorsiUtenti  --action-service=utenti
+php banquet make:action CorsiUtenti  --action-service=utenti --table=utenti
+php banquet make:action CorsiUtenti  # se il service non esiste non ci sarà injecton 
+php banquet make:api corsi  
+php banquet make:api corsiSicurezza --action-service=utenti
 php banquet --class-dao
 php banquet --help
 ```
