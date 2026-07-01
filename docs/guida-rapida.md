@@ -7,19 +7,12 @@ Questa guida mostra un flusso completo, passo per passo, per avviare un progetto
 Clona il repository o scarica la cartella del progetto:
 
 ```bash
-git clone <url-del-repo>
-cd banquet
+composer create-project mssalvo/banquet my-app
+cd my-app
 ```
 
-## 2. Installa le dipendenze
 
-Esegui Composer per installare le dipendenze:
-
-```bash
-composer install
-```
-
-## 3. Configura il database
+## 2. Configura il database
 
 Apri il file:
 
@@ -49,7 +42,7 @@ define('DB_USERNAME', 'postgres');
 define('DB_PASSWORD', 'password');
 ```
 
-## 4. Verifica la connessione
+## 3. Verifica la connessione
 
 Esegui il comando:
 
@@ -59,7 +52,7 @@ php banquet --help
 
 Se appare il menu del generatore, la configurazione è corretta.
 
-## 5. Esegui il generator
+## 4. Esegui il generator
 
 Genera tutto per tutte le tabelle:
 
@@ -73,7 +66,7 @@ Genera solo una tabella:
 php banquet make:map utenti
 ```
 
-## 6. Genera una Action completa
+## 5. Genera una Action completa
 
 Esempio:
 
@@ -87,7 +80,7 @@ Questo genera:
 - View
 - Route
 
-## 7. Genera anche l'API REST
+## 6. Genera anche l'API REST
 
 ```bash
 php banquet make:map corsi full-action
@@ -98,7 +91,7 @@ Questo genera anche:
 - API REST
 - route API
 
-## 8. Avvia il progetto
+## 7. Avvia il progetto
 
 Avvia il server PHP integrato:
 
@@ -112,7 +105,7 @@ Apri nel browser:
 http://localhost:8000/home
 ```
 
-## 9. Esempio pratico: creare una nuova pagina
+## 8. Esempio pratico: creare una nuova pagina
 
 ### Step 1: genera l'Action
 
@@ -140,7 +133,7 @@ app/src/view/pages/prodotti.php
 
 Aggiungi il markup HTML che desideri.
 
-## 10. Esempio di API REST
+## 9. Esempio di API REST
 
 Per una tabella chiamata `iscrizione`:
 
@@ -155,7 +148,7 @@ GET/POST/PUT  /api/iscrizione
 GET/DELETE   /api/iscrizione/{id}
 ```
 
-## 11. Consigli utili
+## 10. Consigli utili
 
 - Usa sempre nomi chiari per tabelle e classi.
 - Controlla i file generati prima di personalizzarli.
@@ -166,7 +159,7 @@ GET/DELETE   /api/iscrizione/{id}
 app/log.txt
 ```
 
-## 12. Risoluzione problemi comuni
+##  Risoluzione problemi comuni
 
 ### Il generator non si connette al database
 
