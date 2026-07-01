@@ -66,6 +66,8 @@ Opzioni:
   --user=USER       Username database
   --pass=PASS       Password database
   --prefix=PREFIX   Prefisso tabella da rimuovere (es. "tbl_")
+  --action-service=SERVICE  Nome del service da usare per l'action se diverso dall'action (es. make:action login  --action-service=User)
+  --table=TABLE     Genera classi solo per la tabella specificata
   --class-dao       Genera la abstract class Dao in src/Dao
   --not-view        Non crea la view in automatico (associata all'Action)
   --not-route       Non crea l'endpoind nel router (associato all'Action)
@@ -82,13 +84,16 @@ Esempi:
    php banquet make:map corsi 
    php banquet make:map corsi full-action 
    php banquet make:api corsi 
+   php banquet make:api <nome-api> --action-service=<nome-service> se diverso dall'nome api
    php banquet make:api corsi --prefix=tbl_ --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
    php banquet make:action corsi 
-   php banquet make:action <nome-action> <nome-service>
-   php banquet --class-dao
+   php banquet make:action <nome-action> --action-service=<nome-service> se diverso dall'action
+   php banquet make:action <nome-action> --action-service=<nome-service> --table=<nome-service> se diverso dall'action e con tabella associata
+   php banquet make:action <nome-action> --not-view --not-route se non si vuole generare la view e il route associato
+   php banquet --class-dao utile per generare la classe astratta Dao.php in src/Dao 
    php banquet --help
-   php banquet --action-view=corsi
-   php banquet --class-dao
+   php banquet --action-view=corsi  genera la view corsi in src/view/pages/corsi.php
+ 
 HELP;
     exit(0);
 }
