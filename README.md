@@ -71,6 +71,105 @@ Tutto partendo direttamente dalle tabelle del database.
 
 ---
 
+# ⚡ Perché utilizzare Banquet?
+
+**Banquet** nasce con un obiettivo semplice: permetterti di sviluppare applicazioni Web e API REST in modo rapido, pulito e senza vincoli.
+
+A differenza di molti framework moderni, **Banquet è scritto in PHP puro** e **non dipende da librerie esterne per il proprio funzionamento**. Nessun ecosistema complesso da imparare, nessuna dipendenza invasiva, nessun obbligo architetturale imposto. Tu hai il controllo totale del tuo progetto.
+
+## 🚀 Libertà totale
+
+Con Banquet non devi adattare il tuo codice al framework.
+
+È il framework che si mette al servizio del tuo codice.
+
+Hai a disposizione una base solida e già strutturata:
+
+* Routing avanzato
+* Dependency Injection
+* MVC
+* API REST
+* Generazione automatica di Entity
+* DAO
+* Model
+* Service
+* CRUD automatico
+* Logging integrato
+
+Ma da quel momento in poi sei completamente libero di costruire ciò che desideri.
+
+## ⚙️ Sviluppa più velocemente
+
+Partendo dalle tabelle del database, Banquet può generare automaticamente:
+
+* Entity
+* DAO
+* Model
+* Service
+* Endpoint REST
+* Route
+* View opzionali
+
+In pochi secondi hai a disposizione una struttura completa e funzionante che ti permette di concentrarti sulla parte più importante del progetto:
+
+**la logica di business.**
+
+## 🔓 Nessun legame, nessuna limitazione
+
+Con Banquet non esistono vincoli tecnologici.
+
+Vuoi usare una libreria esterna?
+
+Perfetto.
+
+Vuoi utilizzare solo PHP puro?
+
+Perfetto.
+
+Vuoi integrare Composer, package esterni o componenti personalizzati?
+
+Perfetto.
+
+Banquet non ti obbliga a seguire una sola strada. Ti fornisce gli strumenti e lascia a te la libertà di scegliere come utilizzarli.
+
+## 🎨 La sola cosa che ti serve è la fantasia
+
+Banquet non cerca di decidere al posto tuo.
+
+Ti offre una base robusta, semplice e produttiva sulla quale costruire qualsiasi cosa:
+
+* Applicazioni aziendali
+* API REST
+* Microservizi
+* Progetti personali
+
+Il limite non è il framework.
+
+**Il limite è soltanto la tua immaginazione.**
+
+## 💙 Banquet è dalla tua parte
+
+Banquet non vuole complicarti la vita con configurazioni infinite, pattern obbligatori o dipendenze nascoste.
+
+Vuole fare esattamente il contrario:
+
+✅ farti risparmiare tempo  
+✅ lasciarti il controllo completo  
+✅ permetterti di sviluppare velocemente  
+✅ aiutarti a trasformare idee in applicazioni reali
+
+**Se hai la voglia di creare e la fantasia di immaginare, Banquet ti fornisce tutto il resto.**
+
+### ⚡ Banquet
+
+**Rapid PHP Development Tool**
+
+> Meno configurazione. Più sviluppo. Più libertà. Più PHP.
+
+
+
+---
+
 ## ⚡ Obiettivo
 
 Ridurre drasticamente il tempo di sviluppo:
@@ -107,9 +206,9 @@ A partire da una tabella database:
 ```sql
 corsi (id, nome, descrizione)
 ```
- 
-#### php banquet make:map corsi full-action
- 
+```shell 
+php banquet make:map corsi full-action
+``` 
 
 Banquet genera automaticamente:
 
@@ -139,7 +238,7 @@ php -S localhost:8000
   
 ---
 
-## Perché Banquet?
+## 💙 Banquet
 
 | | |
 |---|---|
