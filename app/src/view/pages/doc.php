@@ -138,7 +138,7 @@
   <div class="wrap">
     <div class="hero">
       <h1>Documentazione Framework Banquet</h1>
-      <p>Framework PHP leggero per applicazioni web, API REST e generazione automatica di componenti.</p>
+      <p>Banquet è uno strumento PHP che accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route) a partire dal database.</p>
     </div>
 
     <nav>

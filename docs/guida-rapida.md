@@ -2,9 +2,9 @@
 
 Questa guida mostra un flusso completo, passo per passo, per avviare un progetto Banquet, configurare il database e generare i componenti.
 
-## 1. Scarica il progetto
+## 1. Crea progetto
 
-Clona il repository o scarica la cartella del progetto:
+Crea un nuovo banquet progetto:
 
 ```bash
 composer create-project mssalvo/banquet my-app
@@ -17,29 +17,34 @@ cd my-app
 Apri il file:
 
 ```text
-app/setting/config.php
+app/ms/ms-config.php
 ```
 
 Imposta i valori di connessione come ad esempio:
 
 ```php
-define('DB_DRIVER', 'mysql');
 define('DB_HOSTNAME', 'localhost');
 define('DB_PORT', '3306');
-define('DB_DATABASE', 'nome_db');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
+define('DB_USERNAME', 'root');  
+define('DB_PASSWORD', 'root');  
+define('DB_DATABASE', 'mydatabase');
+define('DB_DRIVER', 'mysql');       // mysql / pgsql / sqlite / sqlsrv 
+define('DB_PATH_DATABASE_SQLITE', ''); 
+
 ```
 
 Se usi PostgreSQL, imposta:
 
 ```php
-define('DB_DRIVER', 'pgsql');
+
 define('DB_HOSTNAME', 'localhost');
 define('DB_PORT', '5432');
-define('DB_DATABASE', 'nome_db');
-define('DB_USERNAME', 'postgres');
-define('DB_PASSWORD', 'password');
+define('DB_USERNAME', 'postgres');  
+define('DB_PASSWORD', 'postgres'); 
+define('DB_DATABASE', 'mydatabase');
+define('DB_DRIVER', 'pgsql');       // mysql / pgsql / sqlite / sqlsrv 
+define('DB_PATH_DATABASE_SQLITE', ''); 
+
 ```
 
 ## 3. Verifica la connessione

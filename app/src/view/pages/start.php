@@ -91,14 +91,20 @@
         </div>
       </div>
     </div>
- 
 
     <div class="card">
       <div class="step">
         <div class="step-number">2</div>
         <div>
-          <h3>Installa le dipendenze</h3>
-          <pre>composer install</pre>
+          <h3>Configura il database  (app/ms/ms-config.php)</h3>
+          <pre>
+  define('DB_HOSTNAME', 'localhost');
+  define('DB_PORT', '3306');
+  define('DB_USERNAME', 'root');  
+  define('DB_PASSWORD', 'root');  
+  define('DB_DATABASE', 'mydatabase');
+  define('DB_DRIVER', 'mysql');       // mysql / pgsql / sqlite / sqlsrv 
+  define('DB_PATH_DATABASE_SQLITE', ''); </pre>
         </div>
       </div>
     </div>
@@ -106,21 +112,6 @@
     <div class="card">
       <div class="step">
         <div class="step-number">3</div>
-        <div>
-          <h3>Configura il database</h3>
-          <pre>define('DB_DRIVER', 'mysql');
-define('DB_HOSTNAME', 'localhost');
-define('DB_PORT', '3306');
-define('DB_DATABASE', 'nome_db');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');</pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="step">
-        <div class="step-number">4</div>
         <div>
           <h3>Esegui il generator</h3>
           <pre>php banquet make:map all</pre>
@@ -131,7 +122,7 @@ define('DB_PASSWORD', '');</pre>
 
     <div class="card">
       <div class="step">
-        <div class="step-number">5</div>
+        <div class="step-number">4</div>
         <div>
           <h3>Genera una Action completa</h3>
           <pre>php banquet make:action corsi</pre>
@@ -142,7 +133,7 @@ define('DB_PASSWORD', '');</pre>
 
     <div class="card">
       <div class="step">
-        <div class="step-number">6</div>
+        <div class="step-number">5</div>
         <div>
           <h3>Genera l'API REST</h3>
           <pre>php banquet make:api Corsi </pre>
@@ -153,7 +144,7 @@ define('DB_PASSWORD', '');</pre>
 
     <div class="card">
       <div class="step">
-        <div class="step-number">7</div>
+        <div class="step-number">6</div>
         <div>
           <h3>Avvia il progetto</h3>
           <pre>php -S localhost:8000</pre>
@@ -164,7 +155,7 @@ define('DB_PASSWORD', '');</pre>
 
     <div class="card">
       <div class="step">
-        <div class="step-number">8</div>
+        <div class="step-number">7</div>
         <div>
           <h3>Esempio pratico</h3>
           <pre>php banquet make:action prodotti</pre>

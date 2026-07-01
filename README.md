@@ -5,8 +5,9 @@
 <h1 align="center">Banquet</h1>
 
 <p align="center">
-  <strong>Banquet è un mini Framework Development Tool PHP per lo sviluppo rapido di applicazioni Web e API REST, basato su generazione automatica del codice a partire dal database.</strong>
+  <strong>Banquet è uno strumento PHP che accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route) a partire dal database, lasciando al developer la libertà di costruire il resto come preferisce.</strong>
   <br>
+  Banquet: genera Entity, DAO, Model, Service, API e Route, Action(opzionale), View(opzionale) .<br>
   MVC · Front Controller · DI Container · Composite View · Routing avanzato · Generatore automatico di classi
   <br><br>
   <img src="https://img.shields.io/badge/PHP-%3E%3D%207.4-777BB4?style=flat-square&logo=php">
@@ -30,15 +31,29 @@ php -S localhost:8000
 ```
 
 ---
-
-👉 step reali:
+ 
+### 👉 Come creare una REST API in meno di un minuto con Banquet:
 
 ```md
-1. Crea una tabella DB
-2. Lancia il generator
+1. Crea una tabella DB corsi
+2. php banquet make:api corsi
 3. API pronta
 
 ```
+
+```md
+#    Hai già:
+#    GET    /api/corsi      → lista (JSON)
+#    GET    /api/corsi/5    → corso #5 (JSON)
+#    POST   /api/corsi      → corso (Insert)
+#    PUT    /api/corsi      → corso (Update)
+#    DELETE /api/corsi/5    → corso #5 (Delete)
+
+Banquet: ha generato -> Entity, DAO, Model, Service, API e Route
+
+```
+
+
 
 ## 🚀 Cos'è Banquet
 
@@ -72,7 +87,7 @@ Ridurre drasticamente il tempo di sviluppo:
 - 🔁 Routing automatico
 - 🧱 Architettura MVC
 - ⚙️ Dependency Injection Container
-- 🔐 Sicurezza integrata:
+- 🔐 Utility di sicurezza disponibili:
   - CSRF protection
   - password hashing
   - session management
@@ -93,7 +108,7 @@ A partire da una tabella database:
 corsi (id, nome, descrizione)
 ```
  
-#### php banquet generate --table=corsi --with-api
+#### php banquet make:map corsi full-action
  
 
 Banquet genera automaticamente:
@@ -135,7 +150,7 @@ php -S localhost:8000
 | **Flessibile** | Supporta MySQL, PostgreSQL, SQLite e SQL Server con un unico driver PDO. |
 
 ---
-🔐 Sicurezza
+🔐 Utility di Sicurezza
 
 - password_hash / password_verify
 - CSRF protection
@@ -158,10 +173,10 @@ php -S localhost:8000
 php banquet make:map corsi full-action
 
 # 3 Aggiorna la dump composer per le nuove classi create
-composer dump-autoload, oppure lancia il composer-dump-autoload.bat
+composer dump-autoload
 
 # 4. Visita
-#    http://localhost:8000/corsi      ← Lista corsi (HTML)
+#    http://localhost:8000/corsi       ← Lista corsi (HTML)
 #    http://localhost:8000/api/corsi   ← Lista corsi (JSON)
 ```
 
@@ -299,12 +314,15 @@ CREATE TABLE clienti (
 );
 
 # 2. Genera tutto
-php banquet generate --table=clienti --action=Clienti --with-view --with-route --with-api
+php banquet make:map clienti full-action
 
 # 3. Fatto. Hai già:
-#    GET  /clienti          → lista (HTML)
+#    GET  /clienti          → lista (HTML) 
 #    GET  /api/clienti      → lista (JSON)
 #    GET  /api/clienti/5    → cliente #5 (JSON)
+#    POST /api/clienti      → cliente (Insert)
+#    PUT  /api/clienti      → cliente (Update)
+#    DELETE /api/clienti/5 → cliente #5 (Delete)
 ```
 
 ### Endpoint REST custom
@@ -379,11 +397,7 @@ banquet/
 - Composer
 - PDO extension per il driver scelto (mysql, pgsql, sqlite, sqlsrv)
 
-## Installazione
-
-```bash
-composer install
-```
+## Configura dsn
 
 Configura il database in `app/src/ms/ms-config.php` e via.
 

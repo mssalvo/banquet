@@ -1,6 +1,6 @@
 # Documentazione Framework Banquet
 
-Framework PHP leggero per applicazioni Web, API REST e generazione automatica di componenti.
+Banquet è uno strumento PHP che accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route) a partire dal database.<br>
 
 - **Namespace root**: `Banquet\` (PSR-4 → `app/src/`)
 - **PHP**: >= 7.4
@@ -106,10 +106,23 @@ Esegue:
 ---
 
 ## Quickstart
+```bash
+# creo un progetto
+1. composer create-project mssalvo/banquet my-app
+# configuro il dsn
+2. Configura il database  (app/ms/ms-config.php)
+# genero l'api rest per la tabella utenti
+3. php banquet make:api utenti
+# avvio il server ed accedo all'url
+4. php -S localhost:8000  (http://localhost:8000/api/utenti)
+```
+
+
 
 ### Comandi principali
 
 ```bash
+php banquet --help
 php banquet make:map all               # genera Entity/DAO/Model/Service per tutte le tabelle
 php banquet make:map all --prefix=tbl_ # genera Entity/DAO/Model/Service per tutte le tabelle elimina il prefisso
 php banquet make:map corsi    # genera solo per la tabella specificata
