@@ -62,6 +62,35 @@ Banquet: ha generato -> Entity, DAO, Model, Service, API e Route
 
 ```
 
+### Esempio REST con validazione token
+
+1. Imposta il segreto JWT in `.env`:
+
+```ini
+JWT_SECRET=una_chiave_segreta_lunga_e_random
+```
+
+2. Richiedi il token:
+
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"banquet","password":"banquet"}'
+```
+
+3. Usa il token per chiamate protette:
+
+```bash
+curl -X POST http://localhost:8000/api/corsi \
+  -H "Authorization: Bearer <TOKEN>" \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Corso base","durata":"10h"}'
+```
+
+### API libera
+
+Se vuoi rendere l'endpoint pubblico, elimina `$this->validateAuthToken();` dai metodi che non vuoi proteggere. Così la tua API REST funzionerà senza richiedere token.
+
 
 
 ## 🚀 Cos'è Banquet
@@ -501,7 +530,7 @@ banquet/
 
 ## Configura dsn
 
-Configura il database in `app/src/ms/ms-config.php` e via.
+Configura il database nel file `.env` e via.
 
 ---
 

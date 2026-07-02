@@ -89,18 +89,89 @@ Questo genera:
 - View
 - Route
 
+### Nuove opzioni del generatore Action
+
+- `php banquet make:action Corsi --not-view` → genera solo la Action e la Route.
+- `php banquet make:action Corsi --not-route` → genera la Action e la View, senza Route.
+- `php banquet make:action Corsi --action-service=Corsi` → inietta il service `CorsiService` nel costruttore dell'Action.
+- `php banquet make:action ListaCorsi --with-api` → genera l'Action, la View, la Route e abilita l'API REST associata.
+
 ## 6. Genera anche l'API REST
 
+Se vuoi generare solo l'API REST per una risorsa:
+
 ```bash
-php banquet make:map corsi full-action
+php banquet make:api corsi
 ```
 
-Questo genera anche:
+Se hai già una classe Service e vuoi usarla:
+
+```bash
+php banquet make:api corsi --action-service=Corsi
+```
+
+Se la tabella ha un prefisso nel database:
+
+```bash
+php banquet make:api corsi --prefix=tbl_
+```
+
+Questo genera:
 
 - API REST
 - route API
 
-## 7. Avvia il progetto
+## 7. Autenticazione REST JWT
+
+Banquet supporta l'autenticazione REST con token JWT tramite gli endpoint `/api/login` e `/api/logout`.
+
+### 7.1 Configura la chiave JWT
+
+Nel file `.env` imposta:
+
+```text
+JWT_SECRET=una_chiave_segreta_lunga_e_random
+```
+
+### 7.2 Richiedi un token
+
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"banquet","password":"banquet"}'
+```
+
+Risposta tipica:
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
+### 7.3 Usa il token per chiamare l'API protetta
+
+```bash
+curl -X POST http://localhost:8000/api/corsi \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Corso base","durata":"10h"}'
+```
+
+### 7.3.1 Disabilitare la validazione token
+
+Se desideri un'API libera, rimuovi `$this->validateAuthToken();` dai metodi `POST`, `PUT`, `DELETE` (o da qualsiasi metodo). La chiamata non verrà più bloccata da Bearer o Basic Auth.
+
+### 7.4 Logout e revoca del token
+
+```bash
+curl -X POST http://localhost:8000/api/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+## 8. Avvia il progetto
 
 Avvia il server PHP integrato:
 

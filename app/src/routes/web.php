@@ -8,6 +8,8 @@ $router = new \Banquet\Core\Router();
 $router->post('/api/login', \Banquet\Actions\Auth\LoginAuthRest::class);
 // Logout Autenticazione REST revoca jwt token 
 $router->post('/api/logout', \Banquet\Actions\Auth\LogoutAuthRest::class);
+// Attenzione: queste rotte sono necessarie per il corretto funzionamento dell'autenticazione JWT.
+// Non rimuoverle se utilizzi login/logout per le tue API.
 
 // Homepage
 $router->get('/', \Banquet\Actions\Home::class);
@@ -33,7 +35,7 @@ $router->post('/login', \Banquet\Actions\Login::class);
  
 
  
-
+//url di esempio REST API per la gestione della risorsa Corsi
 $router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class);
 $router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class);
 $router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class);

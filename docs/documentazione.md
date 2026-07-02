@@ -109,15 +109,17 @@ Esegue:
 ```bash
 # creo un progetto
 1. composer create-project mssalvo/banquet my-app
-# configuro il dsn
-2. Configura il database  (nel file .env)
-# genero l'api rest per la tabella utenti
-3. php banquet make:api utenti
+# configuro il database (nel file .env)
+2. Configura il database e imposta JWT_SECRET
+# genero l'api rest per la tabella corsi
+3. php banquet make:api corsi
 # avvio il server ed accedo all'url
-4. php -S localhost:8000  (http://localhost:8000/api/utenti)
+4. php -S localhost:8000
+# ottengo un token JWT
+5. curl -X POST http://localhost:8000/api/login -H "Content-Type: application/json" -d '{"username":"banquet","password":"banquet"}'
+# chiamo l'endpoint protetto con il token
+6. curl -X POST http://localhost:8000/api/corsi -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -d '{"nome":"Corso base"}'
 ```
-
-
 
 ### Comandi principali
 
@@ -130,8 +132,12 @@ php banquet make:map corsi full-action  # genera Entity/DAO/Model/Service + Acti
 php banquet make:action corsi       # Action + view + route se presente il service corsi verrà iniettato nel costruttore altrimenti genera action senza dipendenza
 php banquet make:action <nome-action> --action-service=<nome-service> # Action associa il Service + view + route. Verrà iniettato nel costruttore lo specifico service <nome-service>
 php banquet make:action <nome-action> --table=<nome-action> # se non esiste il service recupera dal database la tabella e ricrea la struttura Entity,Dao,Model,Service
+php banquet make:action <nome-action> --not-view # genera solo Action e Route, senza View
+php banquet make:action <nome-action> --not-route # genera solo Action e View, senza Route
+php banquet make:action <nome-action> --with-api # genera Action, View, Route e chiama l'API REST generata per la stessa risorsa
 php banquet make:api corsi   # genera API REST per Corsi
-php banquet make:api <nome-api>   --action-service=<service> # genera API REST per nome-api ed inietta <service> 
+php banquet make:api <nome-api> --action-service=<service> # genera API REST per nome-api ed inietta il service specificato
+php banquet make:api <nome-api> --prefix=tbl_ # genera API REST per una tabella con prefisso
 php banquet generate --class-dao  # genera la classe astratta Dao / se si cancella per errore
 ```
 
@@ -301,6 +307,115 @@ Puoi estendere `runMiddleware()` in `app/src/Core/Router.php` per altri middlewa
 
 ---
 
+## 6.1 Autenticazione API REST con JWT
+
+Banquet supporta l'autenticazione REST basata su token JWT e fornisce un fallback Basic Auth per test rapidi.
+
+### Endpoint di autenticazione
+
+- `POST /api/login` → genera il token JWT.
+- `POST /api/logout` → revoca il token (blacklist opzionale).
+
+> Attenzione: per l'integrità del sistema di autenticazione non rimuovere le rotte `api/login` e `api/logout` da `app/src/routes/web.php`.
+
+### Configurazione
+
+Nel file `.env` imposta la chiave segreta:
+
+```text
+JWT_SECRET=una_chiave_segreta_lunga_e_random
+```
+
+### Flusso di autenticazione
+
+1. Il client invia username e password a `/api/login`.
+2. Il server risponde con `access_token`, `token_type` e `expires_in`.
+3. Il client invia il token nelle richieste protette con l'header:
+
+```http
+Authorization: Bearer <token>
+```
+
+4. Nei metodi REST protetti viene chiamato `validateAuthToken()`.
+
+### Come funziona `validateAuthToken()`
+
+La classe `Banquet\Core\ActionRestAuthorization` esegue i seguenti controlli:
+
+- Legge l'header `Authorization` in modo cross-platform.
+- Se trova `Bearer <token>`, valida il JWT con `JwtService::validate()`.
+- Se trova `Basic <base64>`, decodifica le credenziali e le verifica (esempio `banquet:banquet`).
+- Se il controllo fallisce, risponde con 401 Unauthorized.
+
+### `JwtService`
+
+Il servizio JWT offre:
+
+- `JwtService::generate(array $payload, int $expirySeconds = 3600)` → genera un token JWT.
+- `JwtService::validate(string $jwt)` → valida firma, scadenza e blacklist opzionale.
+
+### Esempio di login
+
+```bash
+curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"banquet","password":"banquet"}'
+```
+
+Risposta:
+
+```json
+{
+  "access_token": "eyJ...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+
+### Esempio di chiamata protetta
+
+```bash
+curl -X POST http://localhost:8000/api/corsi \
+  -H "Authorization: Bearer eyJ..." \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Corso base","durata":"10h"}'
+```
+
+### API aperta / senza autenticazione
+
+Se non desideri la validazione, elimina semplicemente la chiamata a `$this->validateAuthToken();` dai metodi REST protetti. In questo modo l'endpoint diventa un'API libera, accessibile senza token.
+
+### Esempio di logout
+
+```bash
+curl -X POST http://localhost:8000/api/logout \
+  -H "Authorization: Bearer eyJ..."
+```
+
+### Validazioni dei metodi REST nell'esempio `CorsiRest`
+
+La classe `app/src/Actions/Api/CorsiRest.php` utilizza `validateAuthToken()` sui metodi:
+
+- `POST` → crea un nuovo corso.
+- `PUT` → aggiorna un corso.
+- `DELETE` → elimina un corso.
+
+Il metodo `GET` è lasciato pubblico nell'esempio, ma puoi aggiungere l'autenticazione anche per le letture.
+
+### Come estendere
+
+Se vuoi proteggere anche `GET`, aggiungi `validateAuthToken()` all'interno del `case 'GET'`.
+
+### Nota sulla blacklist
+
+`JwtService::isBlacklisted()` è già presente come helper. Se vuoi revocare i token dopo il logout:
+
+- crea una tabella `jwt_blacklist` con `jti` e `scade_il`
+- salva il `jti` del token a logout
+- decommenta il controllo in `JwtService::validate()`.
+
+---
+
 ## 7. Generatore automatico
 
 Lo script `banquet make:map` crea classi e file base per il progetto.
@@ -324,6 +439,15 @@ Lo script `banquet make:map` crea classi e file base per il progetto.
 - Con `--not-view`: `Action`,  `Route`
 - Senza `--not-route`: `Action`, `View`, `Route`
 - Con `--not-route`: `Action`, `View`
+
+### Parametri utili per `make:api`
+
+| Opzione | Descrizione | Esempio |
+|---|---|---|
+| `--action-service=<service>` | Inietta il `Service` specificato nell'API REST generata. Utile quando vuoi riutilizzare la business logic esistente. | `php banquet make:api corsi --action-service=Corsi` |
+| `--prefix=<prefisso>` | Usa il prefisso della tabella nel database se le tue tabelle iniziano con `tbl_`, `app_`, ecc. | `php banquet make:api corsi --prefix=tbl_` |
+| `--table=<nome-tabella>` | Indica la tabella reale del database quando il nome dell'API è diverso dal nome della tabella. | `php banquet make:api corsi --table=tbl_corsi` |
+| `--dsn=<dsn> --user=<user> --pass=<pass>` | Fornisce una connessione DB esplicita al comando quando vuoi generare da un database specifico. | `php banquet make:api corsi --dsn="mysql:host=localhost;dbname=framework" --user=root --pass=root` |
 
 ### Esempi di comando
 

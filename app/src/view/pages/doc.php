@@ -139,6 +139,7 @@
     <div class="hero">
       <h1>Documentazione Framework Banquet</h1>
       <p>Banquet è uno strumento PHP che accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route) a partire dal database.</p>
+      <p class="muted">In questa documentazione trovi anche le linee guida per le API REST, l'autenticazione JWT e il generatore di classi.</p>
     </div>
 
     <nav>

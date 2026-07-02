@@ -76,7 +76,7 @@
   <div class="wrap">
     <div class="hero">
       <h1>Guida rapida Banquet</h1>
-      <p>Questa pagina mostra un flusso step-by-step per avviare un progetto Banquet, configurare il database e generare i componenti.</p>
+      <p>Questa pagina mostra un flusso step-by-step per avviare un progetto Banquet, configurare il database, generare le API REST e utilizzare l'autenticazione JWT tramite <code>/api/login</code> e <code>/api/logout</code>.</p>
     </div>
 
  
