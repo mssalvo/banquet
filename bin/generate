@@ -750,7 +750,13 @@ class {$apiClass} extends SenderAction
                 break;
 
                 case 'POST':
-                 try {   
+                 try { 
+                // Gestisce entrabe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
+                // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
+                // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
+                // Per i test con autenticazione Basic Auth utilizza username: banquet e password: banquet
+                \$this->validateAuthToken();  
+                
                 \$body = json_decode(file_get_contents('php://input'), true);
                 \$entity = new {$objectName}(\$body);
                 \$this->service->salva(\$entity);
@@ -764,6 +770,12 @@ class {$apiClass} extends SenderAction
 
                 case 'PUT':
                  try {
+                // Gestisce entrabe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
+                // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
+                // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
+                // Per i test con autenticazione Basic Auth utilizza username: banquet e password: banquet
+                \$this->validateAuthToken();
+
                 \$body = json_decode(file_get_contents('php://input'), true);
                 \$entity = new {$objectName}(\$body);
                 \$this->service->update(\$entity);
@@ -776,6 +788,12 @@ class {$apiClass} extends SenderAction
 
                 case 'DELETE':
                  try {
+                // Gestisce entrabe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
+                // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
+                // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
+                // Per i test con autenticazione Basic Auth utilizza username: banquet e password: banquet
+                \$this->validateAuthToken();
+
                 \$data = array();
                 \$data['id']= \$this->route('id');
                 \$this->service->delete(new {$objectName}(\$data));

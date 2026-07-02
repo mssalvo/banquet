@@ -3,8 +3,9 @@
 namespace Banquet\Core;
 
 use Banquet\Core\Log;
+use Banquet\Core\ActionRestAuthorization;
 
-abstract class BaseAction 
+abstract class BaseAction extends ActionRestAuthorization
 {
 
     /**
