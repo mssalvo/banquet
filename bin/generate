@@ -1,5 +1,9 @@
 #!/usr/bin/env php
 <?php
+
+use Banquet\Core\EnvLoader;
+
+ 
 /**
  * Banquet Class Generator
  *
@@ -37,8 +41,14 @@ $API_DIR     = $SRC_DIR . '/Actions/Api';
 $VIEW_DIR    = $BASE_DIR . '/app/src/view/pages';
 $ROUTES_FILE = $BASE_DIR . '/app/src/routes/web.php';
 
+require_once $SRC_DIR .'/Core/EnvLoader.php';
+
+$ENVGEN = EnvLoader::loadArray($BASE_DIR . '/.env'); 
+
+
 // Cerca di caricare la config esistente del progetto
 $configLoaded = false;
+/*
 $configFiles = [
     $BASE_DIR . '/app/src/ms/ms-config.php',
     $BASE_DIR . '/app/setting/config.php',
@@ -49,6 +59,7 @@ foreach ($configFiles as $f) {
         $configLoaded = true;
     }
 }
+*/    
 
 // ──────────────────────────────────────────────────────────────────────────────
 // 2. Linea di comando
@@ -75,7 +86,7 @@ Opzioni:
 
 
 Se --dsn non viene fornito, il generatore usa le costanti DB_*
-definite in app/src/ms/ms-config.php.
+definite nel file .env
 
 Esempi:
    php banquet make:map all
@@ -128,15 +139,16 @@ if ($hasTableMode) {
             $dsn  = $options['dsn'];
             $user = $options['user'] ?? '';
             $pass = $options['pass'] ?? '';
-        } elseif (defined('DB_DRIVER')) {
-            $driver = DB_DRIVER;
-            $host   = defined('DB_HOSTNAME') ? DB_HOSTNAME : 'localhost';
-            $port   = defined('DB_PORT')     ? DB_PORT     : '3306';
-            $dbname = defined('DB_DATABASE') ? DB_DATABASE : '';
-            $user   = defined('DB_USERNAME') ? DB_USERNAME : '';
-            $pass   = defined('DB_PASSWORD') ? DB_PASSWORD : '';
-            $sqlite = defined('DB_PATH_DATABASE_SQLITE') ? DB_PATH_DATABASE_SQLITE : '';
+        }elseif (isset($ENVGEN['DB_DRIVER'])) {
+            $driver = $ENVGEN['DB_DRIVER'];
+            $host   = isset($ENVGEN['DB_HOSTNAME']) ? $ENVGEN['DB_HOSTNAME'] : 'localhost';
+            $port   = isset($ENVGEN['DB_PORT'])     ? $ENVGEN['DB_PORT']     : '3306';
+            $dbname = isset($ENVGEN['DB_DATABASE']) ? $ENVGEN['DB_DATABASE'] : '';
+            $user   = isset($ENVGEN['DB_USERNAME']) ? $ENVGEN['DB_USERNAME'] : '';
+            $pass   = isset($ENVGEN['DB_PASSWORD']) ? $ENVGEN['DB_PASSWORD'] : '';
+            $sqlite = isset($ENVGEN['DB_PATH_DATABASE_SQLITE']) ? $ENVGEN['DB_PATH_DATABASE_SQLITE'] : ''; 
 
+    
             switch ($driver) {
                 case 'mysql':
                     $dsn = "mysql:host={$host};dbname={$dbname};charset=utf8mb4";

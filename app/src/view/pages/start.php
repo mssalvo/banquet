@@ -96,15 +96,16 @@
       <div class="step">
         <div class="step-number">2</div>
         <div>
-          <h3>Configura il database  (app/src/ms/ms-config.php)</h3>
+          <h3>Configura il database nel file (.env)</h3>
           <pre>
-  define('DB_HOSTNAME', 'localhost');
-  define('DB_PORT', '3306');
-  define('DB_USERNAME', 'root');  
-  define('DB_PASSWORD', 'root');  
-  define('DB_DATABASE', 'mydatabase');
-  define('DB_DRIVER', 'mysql');       // mysql / pgsql / sqlite / sqlsrv 
-  define('DB_PATH_DATABASE_SQLITE', ''); </pre>
+  DB_HOSTNAME=localhost
+  DB_PORT=3306
+  DB_USERNAME=root
+  DB_PASSWORD=root
+  DB_DATABASE=framework
+  #driver gestiti sono: mysql / pgsql / sqlite / sqlsrv 
+  DB_DRIVER=mysql
+  DB_PATH_DATABASE_SQLITE= </pre>
         </div>
       </div>
     </div>

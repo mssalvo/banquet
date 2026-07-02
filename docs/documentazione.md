@@ -110,7 +110,7 @@ Esegue:
 # creo un progetto
 1. composer create-project mssalvo/banquet my-app
 # configuro il dsn
-2. Configura il database  (app/ms/ms-config.php)
+2. Configura il database  (nel file .env)
 # genero l'api rest per la tabella utenti
 3. php banquet make:api utenti
 # avvio il server ed accedo all'url
@@ -486,8 +486,8 @@ class Rest extends SenderAction
 
 ## 9. Configurazione
 
-- Le costanti di configurazione principali sono in `app/setting/config.php`
-- `banquet generate` legge anche `app/src/ms/ms-config.php` se non viene passato `--dsn`
+- Le configurazione principali sono in `app/setting/config.php`
+- `Banquet ` legge il file `.env` per la connessione al DB se non viene passato `--dsn`
 - La lingua corrente è gestita in sessione tramite `KEY_LANG`
 - `Factory` espone `set()` e `get()` per dati globali
 

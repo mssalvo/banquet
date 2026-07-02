@@ -38,7 +38,6 @@
       "app/setting/config.php",
       "app/src/ms/config-cors.php",
       "app/src/ms/helper/helpers.php",
-      "app/src/ms/ms-config.php",
       "app/setting/startup.php",
       "app/src/ms/util/htmlreport.php"
     ]

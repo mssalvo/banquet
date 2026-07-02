@@ -20,13 +20,13 @@ class PDODriver {
         //$pdo = new PDO('mysql:host=localhost;dbname=testdb', 'username', 'password');
         //$pdo = new PDO('sqlsrv:Server=localhost;Database=testdb', 'username', 'password');
         //$pdo = new PDO('sqlite:/path/to/database.sqlite');
-        $driver = DB_DRIVER; // Cambia in 'pgsql', 'sqlite', ecc.
-        $host = DB_HOSTNAME;
-        $port = DB_PORT;
-        $dbname = DB_DATABASE;
-        $user = DB_USERNAME;
-        $password = DB_PASSWORD;
-        $pathDbSqllite = DB_PATH_DATABASE_SQLITE;
+        $driver = getenv('DB_DRIVER'); // Cambia in 'pgsql', 'sqlite', ecc.
+        $host = getenv('DB_HOSTNAME');
+        $port = getenv('DB_PORT');
+        $dbname = getenv('DB_DATABASE');
+        $user = getenv('DB_USERNAME');
+        $password = getenv('DB_PASSWORD');
+        $pathDbSqllite = getenv('DB_PATH_DATABASE_SQLITE');
         $charset = 'utf8mb4';
         $dsn = '';
         if ($driver === 'mysql') {

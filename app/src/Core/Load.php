@@ -82,8 +82,8 @@ class Load {
     if(isset(self::newistance($path)->load_)){
         $load=self::istance($path)->load_;
         if ($load == NULL) {
-         Log::writeError('Impossibile trovare il nome proprieta  nel file ' . $path . '  [ ' . $name. '! ]');     
-         trigger_error('Errore: Impossibile trovare il nome proprieta  nel file ' . $path . '  [ ' . $name. '! ]');    
+         Log::writeError('Impossibile trovare il nome proprieta  nel file ' . $path .  '!');     
+         trigger_error('Errore: Impossibile trovare il nome proprieta  nel file ' . $path . '!');    
         }
         
         } 

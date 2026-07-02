@@ -17,19 +17,21 @@ cd my-app
 Apri il file:
 
 ```text
-app/ms/ms-config.php
+.env
 ```
 
 Imposta i valori di connessione come ad esempio:
 
 ```php
-define('DB_HOSTNAME', 'localhost');
-define('DB_PORT', '3306');
-define('DB_USERNAME', 'root');  
-define('DB_PASSWORD', 'root');  
-define('DB_DATABASE', 'mydatabase');
-define('DB_DRIVER', 'mysql');       // mysql / pgsql / sqlite / sqlsrv 
-define('DB_PATH_DATABASE_SQLITE', ''); 
+
+DB_HOSTNAME=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=root
+DB_DATABASE=framework
+#driver gestiti sono: mysql / pgsql / sqlite / sqlsrv 
+DB_DRIVER=mysql
+DB_PATH_DATABASE_SQLITE=
 
 ```
 
@@ -37,13 +39,15 @@ Se usi PostgreSQL, imposta:
 
 ```php
 
-define('DB_HOSTNAME', 'localhost');
-define('DB_PORT', '5432');
-define('DB_USERNAME', 'postgres');  
-define('DB_PASSWORD', 'postgres'); 
-define('DB_DATABASE', 'mydatabase');
-define('DB_DRIVER', 'pgsql');       // mysql / pgsql / sqlite / sqlsrv 
-define('DB_PATH_DATABASE_SQLITE', ''); 
+DB_HOSTNAME=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=mydatabase
+#driver gestiti sono: mysql / pgsql / sqlite / sqlsrv 
+DB_DRIVER=pgsql
+DB_PATH_DATABASE_SQLITE=
+
 
 ```
 
