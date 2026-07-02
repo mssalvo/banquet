@@ -19,15 +19,12 @@ class Rest extends SenderAction
         $this->setTemplateName("pages/json");
 
         $obj= array();
-        $obj["id"]=$this->route('id');;
+        $obj["id"]=$this->route('id')?$this->route('id'):"nessun parametro id";
         $obj["tipo"]="veicolo";
         $obj["marca"]="Audi";
 
 
-
-        $this->varAdd("json",json_encode($obj));
-
-        $this->getResponse()->addHeader('Content-Type: application/json');
+         $this->jsonResponse(200,$obj);
 
         return $this->getTemplate('empty');
     }
