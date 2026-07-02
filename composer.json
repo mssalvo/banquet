@@ -36,7 +36,7 @@
     },
     "files": [
       "app/setting/config.php",
-      "app/setting/config-cors.php",
+      "app/src/ms/config-cors.php",
       "app/src/ms/helper/helpers.php",
       "app/src/ms/ms-config.php",
       "app/setting/startup.php",

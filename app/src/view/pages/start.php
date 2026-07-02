@@ -96,7 +96,7 @@
       <div class="step">
         <div class="step-number">2</div>
         <div>
-          <h3>Configura il database  (app/ms/ms-config.php)</h3>
+          <h3>Configura il database  (app/src/ms/ms-config.php)</h3>
           <pre>
   define('DB_HOSTNAME', 'localhost');
   define('DB_PORT', '3306');

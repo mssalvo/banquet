@@ -3,6 +3,7 @@
 namespace Banquet\Core;
 
 use Banquet\Core\Log;
+use Banquet\Core\Jwt\JwtService;
 
 abstract class ActionRestAuthorization 
 {
@@ -70,13 +71,14 @@ abstract class ActionRestAuthorization
         // 2. Verifica il formato "Bearer <token>" tramite Regex
         if (preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
             $token = $matches[1];
-
+              
+            $userData=  JwtService::validate($token);
             // 3. Logica di validazione del token.
             // In produzione qui verificherai un JWT (Json Web Token) o cercherai il token nel Database.
-            $tokenValido = ($token === "IL_MIO_TOKEN_SEGRETO_123"); // Esempio di token hardcoded per test IL_MIO_TOKEN_SEGRETO_123
+            //$tokenValido = ($token === "IL_MIO_TOKEN_SEGRETO_123"); // Esempio di token hardcoded per test IL_MIO_TOKEN_SEGRETO_123
 
-            if ($tokenValido) {
-                return; // Token valido, l'esecuzione nell'Action  può procedere.
+            if ($userData) {
+                return $userData; // Token valido, l'esecuzione nell'Action  può procedere.
             }
         }
 

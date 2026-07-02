@@ -9,6 +9,7 @@
 	$response->addHeader('Content-Type: text/html; charset=utf-8');
 	$response->setCompression(NULL);
 
+	\Banquet\Core\EnvLoader::load(__DIR__ . '/.env');
 
 	$container = new \Banquet\Core\Container();
  

@@ -3,6 +3,12 @@
 
 $router = new \Banquet\Core\Router();
 
+
+// Login Autenticazione REST genera jwt token 
+$router->post('/api/login', \Banquet\Actions\Auth\LoginAuthRest::class);
+// Logout Autenticazione REST revoca jwt token 
+$router->post('/api/logout', \Banquet\Actions\Auth\LogoutAuthRest::class);
+
 // Homepage
 $router->get('/', \Banquet\Actions\Home::class);
 $router->get('/home', \Banquet\Actions\Home::class);
@@ -22,8 +28,7 @@ $router->get('/utente/{id}', \Banquet\Actions\Home::class)->middleware('auth');
 $router->get('/login', \Banquet\Actions\Login::class);
 // Form POST
 $router->post('/login', \Banquet\Actions\Login::class);
- 
- 
+
 
  
 

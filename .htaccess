@@ -16,3 +16,6 @@
     # 5. Reindirizza tutto il resto a index.php in modo pulito (con QSA per i parametri GET)
     RewriteRule ^ index.php [L,QSA]
 </IfModule>
+<Files .env>
+    Require all denied
+</Files>
