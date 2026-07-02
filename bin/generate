@@ -742,11 +742,10 @@ class {$apiClass} extends SenderAction
                 \$data = \$this->route('id')
                     ? \$this->service->{$getByIdMethod}(\$this->route('id'))
                     : \$this->service->{$getAllMethod}();
-                        http_response_code(200);
-                      \$this->varAdd("json", json_encode(\$data));
+                      \$dataResp = ['success' => true, 'data' =>\$data];
+                      \$this->respondOk(\$dataResp);
                     } catch (\Exception \$e) {
-                    http_response_code(500);
-                    \$this->varAdd("json", json_encode(['error' => 'Internal Server Error', 'message' => \$e->getMessage()]));
+                    \$this->respondServerError(\$e->getMessage());
                     }                      
                 break;
 
@@ -755,12 +754,11 @@ class {$apiClass} extends SenderAction
                 \$body = json_decode(file_get_contents('php://input'), true);
                 \$entity = new {$objectName}(\$body);
                 \$this->service->salva(\$entity);
-                \$data = ['success' => true, 'id' => \$this->service->getLastInsertId()];
-                 http_response_code(201);
-                \$this->varAdd("json", json_encode(\$data));
+                \$entity->setId(\$this->service->getLastInsertId());
+                \$data = ['success' => true, 'data' => \$entity];
+                \$this->respondCreated(\$data);
                 } catch (\Exception \$e) {
-                    http_response_code(500);
-                    \$this->varAdd("json", json_encode(['error' => 'Internal Server Error', 'message' => \$e->getMessage()]));
+                    \$this->respondServerError(\$e->getMessage());
                 }
                 break;
 
@@ -769,12 +767,10 @@ class {$apiClass} extends SenderAction
                 \$body = json_decode(file_get_contents('php://input'), true);
                 \$entity = new {$objectName}(\$body);
                 \$this->service->update(\$entity);
-                \$data = ['success' => true, 'id' => \$entity->id];
-                 http_response_code(200);
-                \$this->varAdd("json", json_encode(\$data));
+                \$data = ['success' => true, 'data' => \$entity];
+                \$this->respondOk(\$data);
                 } catch (\Exception \$e) {
-                    http_response_code(500);
-                    \$this->varAdd("json", json_encode(['error' => 'Internal Server Error', 'message' => \$e->getMessage()]));
+                    \$this->respondServerError(\$e->getMessage());
                 }
                 break;
 
@@ -784,18 +780,17 @@ class {$apiClass} extends SenderAction
                 \$data['id']= \$this->route('id');
                 \$this->service->delete(new {$objectName}(\$data));
                 \$row = \$this->service->{$getByIdMethod}(\$this->route('id'));
-                \$dataJson =\$row? ['success' => false, 'id' => \$this->route('id')] : ['success'=> true,'id'=> \$this->route('id')];
-                \$row?http_response_code(400):http_response_code(204);
-                \$this->varAdd("json", json_encode(\$dataJson));
+                \$row?\$this->respondBadRequest():\$this->respondNoContent();
+                 
                 } catch (\Exception \$e) {
-                    http_response_code(500);
-                    \$this->varAdd("json", json_encode(['error' => 'Internal Server Error', 'message' => \$e->getMessage()]));
+                    \$this->respondServerError(\$e->getMessage());
                 }
                 break;
 
                 default:
                 \$data = ['error' => 'Method not allowed', 'method'=>\$this->getRequestMethod()] ;
-                   \$this->varAdd("json", json_encode(\$data));
+                   \$this->respondOk(\$data);
+                 break;  
         }
 
 

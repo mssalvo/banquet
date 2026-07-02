@@ -28,7 +28,7 @@ abstract class Dao {
 
     abstract protected function getFind($id);
 
-    protected function getDriver(): PDODriver
+    protected function getDriver()
     {
         return PDODriver::getDriver();
     }

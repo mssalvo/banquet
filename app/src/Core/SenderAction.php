@@ -5,9 +5,9 @@ namespace Banquet\Core;
 use Banquet\Core\Factory;
 use Banquet\Core\Log;
 use Banquet\Core\Load;
+use Banquet\Core\BaseAction;
 
-
-abstract class SenderAction{
+abstract class SenderAction extends BaseAction {
 
     private $links = array();
     private $styles = array();
