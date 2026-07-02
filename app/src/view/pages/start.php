@@ -147,6 +147,19 @@
       <div class="step">
         <div class="step-number">6</div>
         <div>
+          <h3>Esempio chiamata REST protetta</h3>
+          <pre>curl -X POST http://localhost:8000/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"banquet","password":"banquet"}'</pre>
+          <p class="muted">Richiedi un token JWT e poi usa <code>Authorization: Bearer &lt;TOKEN&gt;</code> per le chiamate protette.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step">
+        <div class="step-number">7</div>
+        <div>
           <h3>Avvia il progetto</h3>
           <pre>php -S localhost:8000</pre>
           <p class="muted">Poi apri <code>http://localhost:8000/home</code>.</p>
