@@ -24,7 +24,7 @@ $allowedOrigins = [
 	header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
 // - Gestione della richiesta "Preflight" (Metodo OPTIONS)
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     // I browser inviano una richiesta OPTIONS prima di POST/PUT/DELETE per verificare i permessi.
     // Dobbiamo rispondere immediatamente con uno stato 204 (No Content) e interrompere lo script.
     http_response_code(204);

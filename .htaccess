@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c> 
+    # 1. Attiva il motore di riscrittura
+    RewriteEngine On
+
+    # 2. Forza Apache a passare il Bearer Token a PHP (FONDAMENTALE)
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # 3. Imposta la cartella di base (lascia / se il progetto è nella root del dominio)
+    RewriteBase /
+
+    # 4. Se la richiesta corrisponde a un file o a una cartella reale, non fare nulla
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # 5. Reindirizza tutto il resto a index.php in modo pulito (con QSA per i parametri GET)
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>
