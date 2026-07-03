@@ -5,8 +5,10 @@ namespace Banquet\Core;
 class Log {
     private $filename;
 
-    public function __construct($filename = LOG_FILE_NAME) {
-        $this->filename = $filename;
+    public function __construct() {
+        $this->filename = defined('LOG_FILE_NAME') && LOG_FILE_NAME !== ''
+            ? LOG_FILE_NAME
+            : 'log.txt';
     }
 
     public static function writeError($message) {

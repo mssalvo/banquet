@@ -12,7 +12,6 @@ namespace Banquet\Core;
  */
 
 use Banquet\Actions\Error\ErrorRest;
-use Banquet\Actions\Notfound\Notfound;
 use Banquet\Core\Log;
 use Banquet\Actions\Error\Error;
 use Exception;
@@ -98,23 +97,23 @@ class Factory {
         } 
          
         if ($action !== NULL) {
-              Log::writeInfo("Factory Method>output action-> ".$action);
             $output = self::getInstance()->getOutput($action);
             if (self::getInstance()->master_template !== NULL) {
-                self::getInstance()->data[basename(self::getInstance()->master_template)] = $output;
+                self::getInstance()->data[self::shortName(self::getInstance()->master_template)] = $output;
             } else {
-                self::getInstance()->data[basename($action)] = self::getInstance()->getOutput($action);
+                self::getInstance()->data[self::shortName($action)] = self::getInstance()->getOutput($action);
             }
         }
 
-        foreach (self::getInstance()->getActions() as $child) {
-            self::getInstance()->data[basename($child)] = self::getInstance()->getOutput($child);
+        $children = self::getInstance()->getActions();
+        foreach ($children as $child) {
+            self::getInstance()->data[self::shortName($child)] = self::getInstance()->getOutput($child);
         }
 
         if (self::getInstance()->master_template == NULL) {
-            $template = DIR_TEMPLATE_MASTER . basename($action) . '-master' . TEMPLATE_EXT;
+            $template = DIR_TEMPLATE_MASTER . self::shortName($action) . '-master' . TEMPLATE_EXT;
         } else {
-            $template = DIR_TEMPLATE_MASTER . basename(self::getInstance()->master_template) . '-master' . TEMPLATE_EXT;
+            $template = DIR_TEMPLATE_MASTER . self::shortName(self::getInstance()->master_template) . '-master' . TEMPLATE_EXT;
         }
         if (file_exists($template)) {
             extract(self::getInstance()->data);
@@ -219,6 +218,22 @@ class Factory {
         }
 
         return $template;
+    }
+
+    private static function shortName($name)
+    {
+        if (!is_string($name)) {
+            return '';
+        }
+        // namespaced class like Banquet\Actions\Header\Header
+        if (strpos($name, "\\") !== false) {
+            return substr($name, strrpos($name, "\\") + 1);
+        }
+        if (strpos($name, '/') !== false) {
+            return substr($name, strrpos($name, '/') + 1);
+        }
+        // Fallback to basename for other paths
+        return basename($name);
     }
 
     private static function strContains($haystack, $needle, $ignoreCase = false) {

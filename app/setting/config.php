@@ -40,7 +40,7 @@ define('LANG_DEFAULT', 'it');
 define('ACTION_PAGE_INIT', 'home'); 
 define('ACTION_PAGE_404', 'notfound/notfound'); 
 
-define('LOG_DIR_NAME', DIR_APP.'/');
+define('LOG_DIR_NAME', dirname(DIR_APP).'/');
 define('LOG_FILE_NAME', 'log.txt'); 
 define('IS_LOG', 'ALL'); //ERROR - INFO - ALL
 define('LOG_MAX_SIZE',1048576); // 1 MB
