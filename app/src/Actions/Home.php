@@ -20,7 +20,7 @@ class Home extends SenderAction{
         public function send() {
             
         $this->setTemplateName('pages/home');
-        $this->setTemplateChildren(array(\Banquet\Actions\Header\Header::class,\Banquet\Actions\Header\Carousel::class,\Banquet\Actions\Menu\Menu::class,\Banquet\Actions\Footer\Footer::class));
+        $this->setTemplateChildren(array(\Banquet\Actions\Header\Header::class,\Banquet\Actions\Menu\Menu::class,\Banquet\Actions\Footer\Footer::class));
        
         $language=$this->load("message_". $this->getLangName().".php");
         $this->varAdd('lang', $language);

@@ -6,57 +6,57 @@
   <title>Guida rapida Banquet</title>
   <style>
     :root {
-      --bg: #07111f;
-      --panel: #0f172a;
-      --panel-2: #111c33;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
+      --bg: #dfdfdf;
+      --panel: #dfdfdf;
+      --panel-2: #dfdfdf;
+      --text: #102629;
+      --muted: #415d64;
       --accent: #38bdf8;
       --accent-2: #8b5cf6;
       --border: #243449;
-      --code: #020617;
+      --code: #223c3e;
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(135deg, var(--bg), #0f172a 55%, #111827);
-      color: var(--text);
-      line-height: 1.7;
+     margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    /*background: linear-gradient(359deg, var(--bg), #2c4d50 60%, #2c4d50);*/
+    color: var(--text);
+    line-height: 1.7;
     }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
     .hero {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      background: #d1d7d7;
+      border: 0px solid var(--border);
+      border-radius: 6px;
       padding: 24px 26px;
       margin-bottom: 20px;
-      box-shadow: 0 18px 45px rgba(0,0,0,.25);
+      /*box-shadow: 0px 19px 20px 0px #2a6368;*/
     }
-    h1, h2, h3 { color: #f8fafc; }
+    h1, h2, h3 { color: #1f3536; }
     h1 { margin-top: 0; font-size: 2rem; }
     p, li { color: var(--text); }
     .muted { color: var(--muted); }
     .card {
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      /*background: var(--panel-2);*/
+      border: 0px solid var(--border);
+      border-radius: 6px;
       padding: 18px 20px;
       margin-bottom: 16px;
     }
     pre {
-      background: var(--code);
-      color: #e2e8f0;
+      /*background: var(--code);*/
+      color: #1f3536;
       padding: 16px;
-      border-radius: 12px;
+      border-radius: 6px;
       overflow-x: auto;
-      border: 1px solid var(--border);
+      border: 0px solid var(--border);
     }
     code {
-      background: rgba(255,255,255,.06);
+      background: #dfdfdf;
       padding: 2px 6px;
       border-radius: 6px;
-      color: #f8fafc;
+      color: #1f3536;
     }
     ol, ul { padding-left: 20px; }
     .step { display: flex; gap: 12px; align-items: flex-start; }
@@ -64,7 +64,7 @@
       flex: 0 0 34px;
       height: 34px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      background: #1f3536;
       color: white;
       display: grid;
       place-items: center;

@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Documentazione Framework Banquet</title>
+  <title>Documentazione Tools Banquet</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --panel-2: #1f2937;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
+      --bg: #2c4d50;
+      --panel: #2c4d50;
+      --panel-2: #2c4d50;
+      --text: #11211b;
+      --muted: #11211b;
       --accent: #38bdf8;
       --accent-2: #8b5cf6;
       --border: #334155;
-      --code-bg: #020617;
+      --code-bg:  #2c4d50;;
     }
 
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: linear-gradient(135deg, var(--bg), #111827 60%, #1e293b);
-      color: var(--text);
-      line-height: 1.7;
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    /*background: linear-gradient(359deg, var(--bg), #2c4d50 60%, #2c4d50);*/
+    color: var(--text);
+    line-height: 1.7;
     }
 
     a { color: var(--accent); }
@@ -38,12 +38,12 @@
     }
 
     .hero {
-      background: rgba(17,24,39,0.9);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.28);
-      margin-bottom: 24px;
+      background: #d1d7d7;
+    border: 0px solid var(--border);
+    border-radius: 6px;
+    padding: 28px;
+    /*box-shadow: 0 20px 60px #43888e;*/
+    margin-bottom: 24px;
     }
 
     .hero h1 {
@@ -54,15 +54,15 @@
     .hero p { color: var(--muted); margin: 0; }
 
     nav {
-      background: rgba(17,24,39,0.85);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px 20px;
-      position: sticky;
-      top: 12px;
-      z-index: 10;
-      backdrop-filter: blur(8px);
-      margin-bottom: 24px;
+    background: #578a8e;
+    border: 0px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 20px;
+    position: sticky;
+    top: 12px;
+    z-index: 10;
+    backdrop-filter: blur(8px);
+    margin-bottom: 24px;
     }
 
     nav ul {
@@ -81,46 +81,48 @@
     }
 
     section {
-      background: rgba(17,24,39,0.9);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.18);
+    background: #dfdfdf;
+    border: 0px solid var(--border);
+    border-radius: 6px;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+    /*box-shadow: 0 10px 30px #365f63;*/
     }
 
     h2, h3, h4 {
-      margin-top: 0;
-      color: #f8fafc;
+    margin-top: 10px;
+    color: #1c4237;
+    margin-bottom: 10px;
     }
 
     ul, ol { padding-left: 20px; }
     li { margin-bottom: 6px; }
 
     pre {
-      background: var(--code-bg);
-      color: #e2e8f0;
-      padding: 16px;
-      border-radius: 12px;
-      overflow-x: auto;
-      border: 1px solid var(--border);
+      /*background: var(--code-bg);*/
+    color: #0f231f;
+    padding: 16px;
+    border-radius: 12px;
+    overflow-x: auto;
+      border: 0px solid var(--border);
     }
 
     code {
       background: rgba(255,255,255,0.06);
       padding: 2px 6px;
       border-radius: 6px;
-      color: #f8fafc;
+      color: #11211b;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 16px;
+      margin-top: 30px;
     }
 
     .card {
-      background: var(--panel-2);
+      /*background: var(--panel-2);*/
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
