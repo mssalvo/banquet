@@ -92,6 +92,13 @@ curl -X POST http://localhost:8000/api/corsi \
 Se vuoi rendere l'endpoint pubblico, elimina `$this->validateAuthToken();` dai metodi che non vuoi proteggere. Così la tua API REST funzionerà senza richiedere token.
 
 
+---
+
+👉 [Guida rapida](https://github.com/mssalvo/banquet/blob/main/docs/guida-rapida.md)
+👉 [Documentazione](https://github.com/mssalvo/banquet/blob/main/docs/documentazione.md)
+
+---
+
 
 ## 🚀 Cos'è Banquet
 
@@ -286,11 +293,6 @@ php -S localhost:8000
 - password_hash / password_verify
 - CSRF protection
 - sanitizzazione output
-
----
-
-👉 [Guida rapida](https://github.com/mssalvo/banquet/blob/main/docs/guida-rapida.md)
-👉 [Documentazione](https://github.com/mssalvo/banquet/blob/main/docs/documentazione.md)
 
 ---
 
