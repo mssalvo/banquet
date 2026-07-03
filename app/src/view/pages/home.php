@@ -107,10 +107,10 @@ $router->dispatch();</code></pre>
   <h2>Get Started</h2>
   <div class="row">
     <div class="col-md-6">
-      <a href="/doc" class="btn btn-primary btn-lg">📖 Read Documentation</a>
+      <a href="<?= resolveUrl('/doc') ?>" class="btn btn-primary btn-lg">📖 Read Documentation</a>
     </div>
     <div class="col-md-6">
-      <a href="/start" class="btn btn-info btn-lg">🎓 View Examples</a>
+      <a href="<?= resolveUrl('/start') ?>" class="btn btn-info btn-lg">🎓 View Examples</a>
     </div>
   </div>
 </div>

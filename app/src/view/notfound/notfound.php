@@ -10,7 +10,7 @@
     html, body { height: 100%; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      background: linear-gradient(179deg, #ffffff 0%, #1a473b 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -25,7 +25,7 @@
     .error-code {
       font-size: 8rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #e94560, #0f3460);
+      background: linear-gradient(135deg, #042917, #031d01);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -47,13 +47,13 @@
     }
     p {
       font-size: 1rem;
-      color: #a0a0b8;
+      color: #f8f8f8;
       margin-bottom: 2rem;
     }
     .btn-home {
       display: inline-block;
       padding: 0.75rem 2rem;
-      background: #e94560;
+      background: #316643;
       color: #ffffff;
       text-decoration: none;
       border-radius: 6px;
@@ -63,7 +63,7 @@
       cursor: pointer;
     }
     .btn-home:hover {
-      background: #d63851;
+      background: #072926;
       transform: translateY(-1px);
     }
     .btn-home:active {
@@ -77,7 +77,7 @@
     <div class="divider"></div>
     <h1>Pagina non trovata</h1>
     <p>La pagina che stai cercando potrebbe essere stata rimossa,<br>rinominata o temporaneamente non disponibile.</p>
-    <a href="/home" class="btn-home">Torna alla Home</a>
+    <a href="<?=resolveUrl('/home') ?>" class="btn-home">Torna alla Home</a>
   </div>
 </body>
 </html>

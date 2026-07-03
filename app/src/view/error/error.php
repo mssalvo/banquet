@@ -11,12 +11,12 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
     <style>
         :root {
             --bg: #0f172a;
-            --panel: #111827;
-            --border: #334155;
+            --panel: #1a473b;
+            --border: #1a473b;
             --text: #e5e7eb;
-            --muted: #94a3b8;
+            --muted: #bbd6d4;
             --accent: #ef4444;
-            --accent-soft: rgba(239, 68, 68, 0.15);
+            --accent-soft: #1a473b;
         }
 
         * { box-sizing: border-box; }
@@ -24,7 +24,7 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
         body {
             margin: 0;
             font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, var(--bg), #1e293b);
+            background: linear-gradient(179deg, #ffffff 0%, #1a473b 100%);
             color: var(--text);
             min-height: 100vh;
             display: grid;
@@ -35,9 +35,9 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
         .error-card {
             width: min(100%, 640px);
             background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            border: 0px solid var(--border);
+            border-radius: 8px;
+            /*box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);*/
             overflow: hidden;
         }
 
@@ -52,10 +52,10 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
             align-items: center;
             gap: 8px;
             padding: 7px 12px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: rgba(47, 88, 79, 0.81);
+            border: 0px solid rgba(1, 66, 47, 0.77);
             border-radius: 999px;
-            color: #fecaca;
+            color: #dbfdff;
             font-size: 12px;
             font-weight: 700;
             letter-spacing: 0.08em;
@@ -93,7 +93,7 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
             background: rgba(255,255,255,0.03);
             border: 1px solid var(--border);
             border-left: 4px solid var(--accent);
-            border-radius: 12px;
+            border-radius: 6px;
             padding: 16px 18px;
             font-size: 14px;
             line-height: 1.7;
@@ -114,7 +114,7 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
             margin-top: 16px;
             padding: 10px 14px;
             border-radius: 8px;
-            background: #2563eb;
+            background: #013a33;
             color: white;
             text-decoration: none;
             font-weight: 600;
@@ -122,7 +122,7 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
         }
 
         .btn-home:hover {
-            background: #1d4ed8;
+            background: #01221f;
         }
     </style>
 </head>
@@ -137,7 +137,7 @@ $errorMessage = is_array($errorMessage) ? json_encode($errorMessage, JSON_UNESCA
             <span class="error-label">Dettaglio errore</span>
             <div class="error-box"><?php echo htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8'); ?></div>
             <div class="error-foot">Se il problema persiste, contatta l’amministratore del sistema.</div>
-            <a href="/home" class="btn-home">Torna alla home</a>
+            <a href="<?=resolveUrl('/home') ?>" class="btn-home">Torna alla home</a>
         </div>
     </div>
 </body>

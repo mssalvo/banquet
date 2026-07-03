@@ -24,6 +24,10 @@ function e($value)
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+function resolveUrl($value)
+{
+    return htmlspecialchars(FOLDER_HOME . $value, ENT_QUOTES, 'UTF-8');
+}
 
 function slugify($text)
 {

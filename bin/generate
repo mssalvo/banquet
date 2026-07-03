@@ -843,11 +843,11 @@ function addApiRoutes(string $className): bool
     $routeName = strtolower(lcfirst($className));
     $apiClass  = '\\Banquet\\Actions\\Api\\' . $className . 'Rest::class';
 
-    $routeAll  = "\$router->get('/api/{$routeName}', {$apiClass});";
-    $routeById = "\$router->get('/api/{$routeName}/{id}', {$apiClass});";
-    $routePost  = "\$router->post('/api/{$routeName}', {$apiClass});";
-    $routePut  = "\$router->put('/api/{$routeName}', {$apiClass});";
-    $routeDelete  = "\$router->delete('/api/{$routeName}/{id}', {$apiClass});";
+    $routeAll  = "\$router->get(FOLDER_HOME.'/api/{$routeName}', {$apiClass});";
+    $routeById = "\$router->get(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass});";
+    $routePost  = "\$router->post(FOLDER_HOME.'/api/{$routeName}', {$apiClass});";
+    $routePut  = "\$router->put(FOLDER_HOME.'/api/{$routeName}', {$apiClass});";
+    $routeDelete  = "\$router->delete(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass});";
 
     if (!file_exists($ROUTES_FILE)) {
         echo "  ✗ File routes non trovato: {$ROUTES_FILE}\n";
@@ -902,7 +902,7 @@ function addRouteEntry(string $className): bool
     global $ROUTES_FILE;
     $routeName = strtolower(lcfirst($className));
     $actionFqcn = '\\Banquet\\Actions\\' . $className . '::class';
-    $routeLine = "\$router->get('/{$routeName}', \\Banquet\\Actions\\{$className}::class);";
+    $routeLine = "\$router->get(FOLDER_HOME.'/{$routeName}', \\Banquet\\Actions\\{$className}::class);";
 
     if (!file_exists($ROUTES_FILE)) {
         echo "  ✗ File routes non trovato: {$ROUTES_FILE}\n";
