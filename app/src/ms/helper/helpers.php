@@ -86,3 +86,17 @@ function sanitizeGet($param,$filter_sanitize=FILTER_SANITIZE_SPECIAL_CHARS){
 function sanitizeVar($dato,$filter_sanitize=FILTER_SANITIZE_SPECIAL_CHARS){
     return filter_var($dato, $filter_sanitize);
 }
+
+function generateUrl($pattern, $params)
+{
+    foreach ($params as $key => $value) {
+        $pattern = str_replace("{" . $key . "}", $value, $pattern);
+    }
+    return $pattern;
+}
+/*
+echo generateUrl('/corso/{slug}-{id}', [
+    'slug' => 'calcio-base',
+    'id'   => 25
+]);
+*/

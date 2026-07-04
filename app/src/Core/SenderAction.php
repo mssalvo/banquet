@@ -101,6 +101,24 @@ abstract class SenderAction extends BaseAction {
         }
     }
 
+        public function getValidSecurityPostCsrf() {
+        
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+                if (!isset($_POST['_csrf']) || $_POST['_csrf'] !== $_SESSION['_csrf']) {
+                    //return false;
+                    $this->redirect('/notauthorization', 'refresh');
+                    exit;
+                    //die("CSRF validation failed");
+                }
+
+                return true;
+            } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                return true;
+            }
+
+    }
+
     public function setSession($key,$value) {
             $_SESSION[$key]=$value;
     }

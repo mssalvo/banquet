@@ -7,7 +7,7 @@
  */
 namespace Banquet\Actions;
 use \Banquet\Core\SenderAction;
-
+use Banquet\Core\Log;
 class Login extends SenderAction{
 
     private $model;
@@ -24,22 +24,37 @@ class Login extends SenderAction{
         $this->setTemplateName("pages/login");
         $this->setTemplateChildren(array(\Banquet\Actions\Header\Header::class,\Banquet\Actions\Menu\Menu::class,\Banquet\Actions\Footer\Footer::class));
 
+        
 
-        $language=$this->load("message_". $this->getLangName().".php");
+        $language=$this->loadLanguage();
+
         $this->varAdd('lang', $language);
 
 
 
         if (isset($_POST['password']) && isset($_POST['email'])) {
- 
+                
+                $this->getValidSecurityPostCsrf();
             //.. fai qualcosa autentica!
           
-            if($this->model->checkUser($_POST['email'], $_POST['password'])){
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            $user = $this->model->findByEmail($email);
+
+            if ($user && password_verify($password, $user['password'])) {
+                Log::writeInfo("validazione con successo: userId:".$user["id"]." !");
+                session_regenerate_id(true);
                 
-                //.. utente valido
+                $_SESSION['user_id'] = $user['id'];
+
+                $this->redirect('/home', 'refresh');
+            } else {
+                $this->varAdd('error', 'Credenziali non valide');
             }
+ 
             
-            $this->redirect('/home', 'refresh');     
+            //$this->redirect('/login', 'refresh');     
             
  
         }else{

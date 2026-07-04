@@ -18,7 +18,7 @@ $router->post(FOLDER_HOME.'/api/logout', \Banquet\Actions\Auth\LogoutAuthRest::c
 $router->get(FOLDER_HOME.'/', \Banquet\Actions\Home::class);
 $router->get(FOLDER_HOME.'/home', \Banquet\Actions\Home::class);
 $router->get(FOLDER_HOME.'/rest', \Banquet\Actions\Documentazione\Rest::class);
-
+$router->get(FOLDER_HOME.'/notauthorization', \Banquet\Actions\Notfound\Notauthorization::class);
 //   
 $router->get(FOLDER_HOME.'/doc/{tipo}/{id}', \Banquet\Actions\Documentazione\Doc::class);
 $router->get(FOLDER_HOME.'/doc', \Banquet\Actions\Documentazione\Doc::class);

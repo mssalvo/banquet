@@ -2,6 +2,7 @@
 <div class="container">
 
         <form class="form-signin" action="/login" method="post">
+        <input type="hidden" name="_csrf" value="<?= csrf_token() ?>">  
         <h2 class="form-signin-heading">Please sign in</h2>
         <input type="text" class="form-control" id="email"  name="email" placeholder="Email address" autofocus>
         <input type="password" id="password" name="password" class="form-control" placeholder="Password">
@@ -9,6 +10,9 @@
           <input type="checkbox" value="remember-me"> Remember me
         </label>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+
+         <div class="form-control"><?php echo isset($error)?$error:'' ?></div> 
       </form>
 
-    </div>  
+    </div> 
+    

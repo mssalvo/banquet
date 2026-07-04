@@ -16,5 +16,10 @@ class Login {
         
         return TRUE;
     }
+
+    public function findByEmail($email){
+        //Esempio simulazione
+        return array("id"=>"145","password"=>password_hash('123456', PASSWORD_DEFAULT));
+    }
     
 }
