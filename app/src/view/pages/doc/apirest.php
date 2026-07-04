@@ -134,6 +134,17 @@
             <code>PUT /api/corsi</code>.<br>
             <code>DELETE /api/corsi/{id}</code>.
             </p>
+      <p class="muted"><br>
+      <b><br>Le chiamate Rest includono il metodo del controller da richiamare (solo per le api rest)</b><br>
+      <h3>Route generate in (app/src/routes/web.php)</h3><br>
+      <code>$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');</code><br>
+      <code>$router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getById');</code><br>
+      <code>$router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getInsert');</code><br>
+      <code>$router->put('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getUpdate');</code><br>
+      <code>$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getDelete');</code>
+
+
+   </p>         
         </div>
       </div>
     </div>

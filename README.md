@@ -351,6 +351,21 @@ $router->get('/blog/{slug}-{id}', \Banquet\Actions\Articolo::class);
 $router->post('/articoli', \Banquet\Actions\Articolo::class)->middleware('auth');
 ```
 
+### Le Route Rest Api includono anche il metodo del controller da richiamare (solo per le api rest)
+
+```php
+ 
+$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');
+$router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getById');
+$router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getInsert');
+$router->put('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getUpdate');
+$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getDelete');
+
+
+```
+
+
+
 ### 3. DI Container con Auto-Resolution
 
 Nessuna configurazione. Il container risolve le dipendenze automaticamente:
@@ -368,19 +383,40 @@ class Articoli extends SenderAction {
 
 ### 4. API JSON in una riga
 
-Trasforma qualsiasi Action in un endpoint REST:
+- Trasforma qualsiasi Action in un endpoint REST:
+- Route che richiama il metodo Rest indicato ( solo per le chiamte Rest )
+
+```php
+$router->get('/api/articoli/{id}', \Banquet\Actions\Api\ArticoliRest::class)->rest('getById');;
+$router->post('/api/articoli', \Banquet\Actions\Api\ArticoliRest::class)->rest('getAll');
+```
 
 ```php
 class ArticoliRest extends SenderAction {
-    public function send() {
-        $this->setTemplateName("pages/json");
-        $data = $this->route('id')
-            ? $this->service->getArticoloById($this->route('id'))
-            : $this->service->getAllArticoli();
-        $this->varAdd("json", json_encode($data));
-        $this->getResponse()->addHeader('Content-Type: application/json');
-        return $this->getTemplate('empty');
+
+   public function __construct(ArticoliService $service) {
+        $this->service=$service;
     }
+
+    public function getById($id) { 
+        //.....
+     }
+
+     public function getAll():void
+    {
+        try {
+      
+            $data = $this->service->getAllArticoli();
+            $dataResp = ['success' => true, 'data' => $data];
+            $this->respondOk($dataResp);
+
+        } catch (\Exception $e) {
+            $this->respondServerError($e->getMessage());
+        }
+
+    }
+    
+    public function send() { }
 }
 ```
 
@@ -458,9 +494,16 @@ php banquet make:map clienti full-action
 #    DELETE /api/clienti/5 → cliente #5 (Delete)
 ```
 
-### Endpoint REST custom
+### Endpoint REST custom utilizzando il methodo send per la gestione view senza indicare il methodo nel rooter
+```php
+
+$router->get('/api/clienti/{id}', \Banquet\Actions\Api\ClientiRest::class);
+$router->post('/api/clienti', \Banquet\Actions\Api\ClientiRest::class);
+
+```
 
 ```php
+
 use Banquet\Actions\Api\ClientiRest;
 
 class ClientiRest extends SenderAction {
@@ -471,7 +514,7 @@ class ClientiRest extends SenderAction {
     }
 
     public function send() {
-        $this->setTemplateName("pages/json");
+         
 
         $method = $_SERVER['REQUEST_METHOD'];
 
@@ -480,20 +523,21 @@ class ClientiRest extends SenderAction {
                 $data = $this->route('id')
                     ? $this->service->getClientiById($this->route('id'))
                     : $this->service->getAllClienti();
+                this->respondOk($data);
                 break;
             case 'POST':
                 $body = json_decode(file_get_contents('php://input'), true);
                 $entity = new Clienti($body);
                 $this->service->salva($entity);
                 $data = ['success' => true, 'id' => $this->service->getLastId()];
+                this->respondOk($data);
                 break;
             default:
                 $data = ['error' => 'Method not allowed'];
+                this->respondOk($data);
         }
-
-        $this->varAdd("json", json_encode($data));
-        $this->getResponse()->addHeader('Content-Type: application/json');
-        return $this->getTemplate('empty');
+         
+          
     }
 }
 ```

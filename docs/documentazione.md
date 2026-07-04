@@ -164,16 +164,24 @@ $router = new \Banquet\Core\Router();
 $router->get('/', \Banquet\Actions\Home::class);
 $router->get('/home', \Banquet\Actions\Home::class);
 $router->get('/doc/{tipo}/{id}', \Banquet\Actions\Doc::class);
-$router->get('/doc', \Banquet\Actions\Doc::class);
-$router->get('/rest', \Banquet\Actions\Rest::class);
-$router->get('/rest/{id}', \Banquet\Actions\Rest::class);
-$router->get('/rest/{slug}-{id}', \Banquet\Actions\Rest::class);
-$router->get('/rest/{id}/{code}', \Banquet\Actions\Rest::class)->middleware('auth');
+$router->get('/doc', \Banquet\Actions\Doc::class)->middleware('auth');;
 $router->get('/utente/{id}', \Banquet\Actions\Home::class)->middleware('auth');
 $router->get('/login', \Banquet\Actions\Login::class);
 $router->post('/login', \Banquet\Actions\Login::class);
 
 return $router;
+```
+- Route generate per le chiamate Rest includono anche il metodo del controller da richiamare (solo per le api rest)
+
+```php
+ 
+$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');
+$router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getById');
+$router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getInsert');
+$router->put('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getUpdate');
+$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getDelete');
+
+
 ```
 
 ### Pattern supportati

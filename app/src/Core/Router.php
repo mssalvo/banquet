@@ -134,9 +134,10 @@ class Router
                     $this->runMiddleware($mw);
                 }
 
-                if (isset($route['action']) && isset($route['execute']) && $route['execute'] != "send") {
+                if (isset($route['action']) && isset($route['execute']) && $route['execute'] != null) {
                     
-                 return $this->runApi($route, $params);
+                  return $this->runApi($route, $params);
+                  
                 }
 
                 return $route['action'];
@@ -200,7 +201,7 @@ class Router
          $ction = $route['action'];
          $execute = $route['execute'];
         
-        if ($execute != "send" && class_exists($ction)) {
+        if ($execute != null && class_exists($ction)) {
             $controller = resolve($ction);
             if (method_exists($controller, $execute)) { 
                 call_user_func_array([$controller, $execute], $params);
