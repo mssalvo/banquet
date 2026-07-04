@@ -20,39 +20,42 @@ class Router
     {
         return $this->add('POST', $pattern, $action);
     }
-    
+
     /**
-     * Registra una rotta POST
+     * Registra una rotta PUT
      */
     public function put($pattern, $action)
     {
-       return $this->add('PUT', $pattern, $action);
+        return $this->add('PUT', $pattern, $action);
     }
-    
+
     /**
      * Registra una rotta DELETE
      */
     public function delete($pattern, $action)
     {
-       return $this->add('DELETE', $pattern, $action);
+        return $this->add('DELETE', $pattern, $action);
     }
     /**
      * Registra una rotta OPTIONS
      */
-    public function options($pattern, $action){
+    public function options($pattern, $action)
+    {
         return $this->add('OPTIONS', $pattern, $action);
     }
     /**
      * Registra una rotta HEAD
      */
-    public function head($pattern, $action){
+    public function head($pattern, $action)
+    {
         return $this->add('HEAD', $pattern, $action);
     }
-    
+
     /**
      * Registra una rotta PATCH
      */
-    public function patch($pattern, $action){
+    public function patch($pattern, $action)
+    {
         return $this->add('PATCH', $pattern, $action);
     }
 
@@ -65,13 +68,14 @@ class Router
             'method' => $method,
             'pattern' => $pattern,
             'action' => $action,
+            'execute' => 'send',
             'middleware' => []
         ];
 
         $this->routes[] = &$route;
 
         // ritorna oggetto fluente per middleware
-        return new class($route) {
+        return new class ($route) {
             private $route;
 
             public function __construct(&$route)
@@ -82,6 +86,11 @@ class Router
             public function middleware($name)
             {
                 $this->route['middleware'][] = $name;
+                return $this;
+            }
+              public function rest($name)
+            {
+                $this->route['execute'] = $name;
                 return $this;
             }
         };
@@ -123,6 +132,11 @@ class Router
                 // Middleware
                 foreach ($route['middleware'] as $mw) {
                     $this->runMiddleware($mw);
+                }
+
+                if (isset($route['action']) && isset($route['execute']) && $route['execute'] != "send") {
+                    
+                 return $this->runApi($route, $params);
                 }
 
                 return $route['action'];
@@ -179,5 +193,20 @@ class Router
             default:
                 break;
         }
+    }
+
+    private function runApi($route, $params=[])
+    {
+         $ction = $route['action'];
+         $execute = $route['execute'];
+        
+        if ($execute != "send" && class_exists($ction)) {
+            $controller = resolve($ction);
+            if (method_exists($controller, $execute)) { 
+                call_user_func_array([$controller, $execute], $params);
+            }
+        }
+
+        return $ction;
     }
 }

@@ -735,6 +735,7 @@ namespace Banquet\Actions\Api;
 use Banquet\Core\SenderAction;
 use Banquet\Service\\{$serviceClass};
 use Banquet\Entity\\{$objectName};
+use Banquet\Core\Log;
 
 class {$apiClass} extends SenderAction
 {
@@ -742,92 +743,107 @@ class {$apiClass} extends SenderAction
     public function __construct({$serviceClass} \$service) {
         \$this->service=\$service;
     }
-    public function send()
+
+
+    public function getAll():void
     {
-        \$this->setTemplateName("pages/json");
-
-
-        switch (\$this->getRequestMethod()) {
-
-                case 'GET':
-                 try {
-                \$data = \$this->route('id')
-                    ? \$this->service->{$getByIdMethod}(\$this->route('id'))
-                    : \$this->service->{$getAllMethod}();
-                      \$dataResp = ['success' => true, 'data' =>\$data];
-                      \$this->respondOk(\$dataResp);
-                    } catch (\Exception \$e) {
-                    \$this->respondServerError(\$e->getMessage());
-                    }                      
-                break;
-
-                case 'POST':
-                 try { 
-                // Gestisce entrambe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
-                // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
-                // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
-                // Per test con autenticazione Basic Auth utilizza username: banquet e password: banquet
-                \$this->validateAuthToken();  
-                
-                \$body = json_decode(file_get_contents('php://input'), true);
-                \$entity = new {$objectName}(\$body);
-                \$this->service->salva(\$entity);
-                \$entity->setId(\$this->service->getLastInsertId());
-                \$data = ['success' => true, 'data' => \$entity];
-                \$this->respondCreated(\$data);
-                } catch (\Exception \$e) {
-                    \$this->respondServerError(\$e->getMessage());
-                }
-                break;
-
-                case 'PUT':
-                 try {
-                // Gestisce entrambe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
-                // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
-                // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
-                // Per test con autenticazione Basic Auth utilizza username: banquet e password: banquet
-                \$this->validateAuthToken();
-
-                \$body = json_decode(file_get_contents('php://input'), true);
-                \$entity = new {$objectName}(\$body);
-                \$this->service->update(\$entity);
-                \$data = ['success' => true, 'data' => \$entity];
-                \$this->respondOk(\$data);
-                } catch (\Exception \$e) {
-                    \$this->respondServerError(\$e->getMessage());
-                }
-                break;
-
-                case 'DELETE':
-                 try {
-                // Gestisce entrambe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
-                // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
-                // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
-                // Per test con autenticazione Basic Auth utilizza username: banquet e password: banquet
-                \$this->validateAuthToken();
-
-                \$data = array();
-                \$data['id']= \$this->route('id');
-                \$this->service->delete(new {$objectName}(\$data));
-                \$row = \$this->service->{$getByIdMethod}(\$this->route('id'));
-                \$row?\$this->respondBadRequest():\$this->respondNoContent();
-                 
-                } catch (\Exception \$e) {
-                    \$this->respondServerError(\$e->getMessage());
-                }
-                break;
-
-                default:
-                \$data = ['error' => 'Method not allowed', 'method'=>\$this->getRequestMethod()] ;
-                   \$this->respondOk(\$data);
-                 break;  
+        try {
+            Log::writeInfo('{$apiClass}: called-> getAll');
+            \$data = \$this->service->{$getAllMethod}();
+            \$dataResp = ['success' => true, 'data' => \$data];
+            \$this->respondOk(\$dataResp);
+        } catch (\Exception \$e) {
+            \$this->respondServerError(\$e->getMessage());
         }
 
-
-            \$this->getResponse()->addHeader('Content-Type: application/json');
-
-            return \$this->getTemplate('empty');
     }
+
+
+    public function getById(\$id = null):void
+    {
+        try {
+            Log::writeInfo('{$apiClass}: called-> getById: ' . \$id);
+            \$data = \$this->service->{$getByIdMethod}(\$id);
+            \$dataResp = ['success' => true, 'data' => \$data];
+            \$this->respondOk(\$dataResp);
+        } catch (\Exception \$e) {
+            \$this->respondServerError(\$e->getMessage());
+        }
+
+    }
+
+    public function getInsert():void
+    {
+        try {
+            // Gestisce entrambe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
+            // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
+            // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
+            // Per test con autenticazione Basic Auth utilizza username: banquet e password: banquet
+            \$this->validateAuthToken();
+
+            \$body = json_decode(file_get_contents('php://input'), true);
+            Log::writeInfo('{$apiClass}: called-> getInsert:: ' . json_encode(\$body));
+            \$entity = new {$objectName}(\$body);
+            \$this->service->salva(\$entity);
+            \$entity->setId(\$this->service->getLastInsertId());
+            \$data = ['success' => true, 'data' => \$entity];
+            \$this->respondCreated(\$data);
+        } catch (\Exception \$e) {
+            \$this->respondServerError(\$e->getMessage());
+        }
+
+    }
+
+    public function getUpdate():void
+    {
+        try {
+            // Gestisce entrambe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
+            // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
+            // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
+            // Per test con autenticazione Basic Auth utilizza username: banquet e password: banquet
+            \$this->validateAuthToken();
+
+            \$body = json_decode(file_get_contents('php://input'), true);
+            \$entity = new {$objectName}(\$body);
+             Log::writeInfo('{$apiClass}: called-> getUpdate:: ' . json_encode(\$entity));
+            \$this->service->update(\$entity);
+            \$data = ['success' => true, 'data' => \$entity];
+            \$this->respondOk(\$data);
+        } catch (\Exception \$e) {
+            \$this->respondServerError(\$e->getMessage());
+        }
+
+    }
+
+
+    public function getDelete(\$id=null):void
+    {
+        try {
+            // Gestisce entrambe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
+            // Se vuoi solo Bearer Token, puoi rimuovere la parte Basic Auth o viceversa.
+            // Se non vuoi nessuna autenticazione, puoi rimuovere questa chiamata.
+            // Per test con autenticazione Basic Auth utilizza username: banquet e password: banquet
+            \$this->validateAuthToken();
+
+            \$data['id']= \$id;
+            \$this->service->delete(new {$objectName}(\$data));
+            Log::writeInfo('{$apiClass}: called-> getDelete:: id: ' . \$data['id']);
+              \$this->respondNoContent();
+            
+        } catch (\Exception \$e) {
+            \$this->respondServerError(\$e->getMessage());
+        }
+    }
+
+
+    public function send()
+    {
+   /* Questo metodo non è necessario per le API REST, ma è richiesto dalla classe base SenderAction.
+    * Puoi lasciarlo vuoto o implementare una logica di default se necessario.
+    *   \$this->respondNotFound('Endpoint non trovato.');
+    */
+    }
+
 }
 
 PHP;
@@ -843,11 +859,11 @@ function addApiRoutes(string $className): bool
     $routeName = strtolower(lcfirst($className));
     $apiClass  = '\\Banquet\\Actions\\Api\\' . $className . 'Rest::class';
 
-    $routeAll  = "\$router->get(FOLDER_HOME.'/api/{$routeName}', {$apiClass});";
-    $routeById = "\$router->get(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass});";
-    $routePost  = "\$router->post(FOLDER_HOME.'/api/{$routeName}', {$apiClass});";
-    $routePut  = "\$router->put(FOLDER_HOME.'/api/{$routeName}', {$apiClass});";
-    $routeDelete  = "\$router->delete(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass});";
+    $routeAll  = "\$router->get(FOLDER_HOME.'/api/{$routeName}', {$apiClass})->rest('getAll');";
+    $routeById = "\$router->get(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass})->rest('getById');";
+    $routePost  = "\$router->post(FOLDER_HOME.'/api/{$routeName}', {$apiClass})->rest('getInsert');";
+    $routePut  = "\$router->put(FOLDER_HOME.'/api/{$routeName}', {$apiClass})->rest('getUpdate');";
+    $routeDelete  = "\$router->delete(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass})->rest('getDelete');";
 
     if (!file_exists($ROUTES_FILE)) {
         echo "  ✗ File routes non trovato: {$ROUTES_FILE}\n";
