@@ -92,6 +92,26 @@ Per API pubbliche, elimina `$this->validateAuthToken();` dai metodi che vuoi ren
 | `php banquet make:api corsi` | API REST + Route |
 | `php banquet make:action myaction --action-service=User` | Action con service diverso |
 
+
+## OpenAPI / Swagger
+
+Genera annotation OpenAPI su Entity e classi REST, ed esporta il file `openapi.yaml` per visualizzare la documentazione con Swagger UI.
+
+```bash
+# 1. Installa la libreria per le annotation
+composer require zircote/swagger-php
+
+# 2. Genera Entity e API con annotation OpenAPI
+php banquet make:api corsi --with-swagger
+
+# 3. Esporta il file openapi.yaml
+./vendor/bin/openapi app -o openapi.yaml
+```
+
+Il file `OpenApiConfig.php` (con le info globali: server, security, tag) viene creato automaticamente una sola volta nella directory `app/src/Actions/Api/`.
+
+
+
 ## Routing
 
 ```php
