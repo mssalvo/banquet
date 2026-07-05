@@ -90,7 +90,7 @@ Per API pubbliche, elimina `$this->validateAuthToken();` dai metodi che vuoi ren
 | `php banquet make:map corsi full-action` | Come sopra + Action, View, Route, API REST |
 | `php banquet make:action clienti` | Action + View + Route |
 | `php banquet make:api corsi` | API REST + Route |
-| `php banquet make:api corsi --with-swagger` | API REST + Route + annotation OpenAPI |
+| `php banquet make:api corsi --with-swagger` | API REST + Route + OpenAPI |
 | `php banquet make:action myaction --action-service=User` | Action con service diverso |
 
 
