@@ -32,7 +32,8 @@ $router->get(FOLDER_HOME.'/login', \Banquet\Actions\Login::class);
 $router->post(FOLDER_HOME.'/login', \Banquet\Actions\Login::class);
 
 //Esempio Route per chiamata Rest (indica il nome del methodo es. ->rest('mio metodo'))
-//$router->get(FOLDER_HOME.'/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');
+//$router->get(FOLDER_HOME.'/api/xxxxx', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');
 
  
+
 return $router; 
