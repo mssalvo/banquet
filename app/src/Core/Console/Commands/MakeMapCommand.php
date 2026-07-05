@@ -31,7 +31,12 @@ class MakeMapCommand extends Command
         if ($hasPrefix) {
          $stringPrefix=' --prefix='.$arra_associativo['prefix'] ?? '';
         }
-
+        
+        $hasSwagger  = isset($arra_associativo['with-swagger']);
+                 $stringSwagger='';
+                if ($hasSwagger) {
+                $stringSwagger=' --with-swagger';
+                }
         
         $hasNotView  = isset($arra_associativo['not-view']);
         $stringParam='--with-view --with-route';
@@ -67,9 +72,9 @@ class MakeMapCommand extends Command
             echo "⚡ Generazione Entity, Dao, Crud, Model, Service per: $table\n";
             $cmd = "";
             if($hasDns){ 
-             $cmd = "php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$table --action=$table $stringPrefix $stringParam --with-api"; 
+             $cmd = "php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$table --action=$table $stringPrefix $stringParam --with-api $stringSwagger"; 
             } else {
-             $cmd = "php bin/generate --table=$table --action=$table $stringPrefix $stringParam --with-api"; 
+             $cmd = "php bin/generate --table=$table --action=$table $stringPrefix $stringParam --with-api $stringSwagger"; 
             }
             passthru($cmd);
 

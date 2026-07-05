@@ -31,6 +31,10 @@ class MakeActionCommand extends Command
         if ($hasApi) {
          $stringParam= $stringParam . ' --with-api';
         }
+         $hasSwagger  = isset($arra_associativo['with-swagger']);
+                if ($hasSwagger) {
+                 $stringParam= $stringParam . ' --with-swagger';
+                }
 
         $service =  null;
         $hasActionService = isset($arra_associativo['action-service']);

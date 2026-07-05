@@ -26,9 +26,15 @@ class MakeApiCommand extends Command
             $user = $arra_associativo['user'] ?? '';
             $pass = $arra_associativo['pass'] ?? '';    
         }
-    
+
+          $hasSwagger  = isset($arra_associativo['with-swagger']);
+                 $stringSwagger='';
+                if ($hasSwagger) {
+                $stringSwagger=' --with-swagger';
+                }
+
          $hasPrefix  = isset($arra_associativo['prefix']);
-         $stringPrefix='';
+
         if ($hasPrefix) {
          $stringPrefix=' --prefix='.$arra_associativo['prefix'] ?? '';
         }
@@ -52,13 +58,13 @@ class MakeApiCommand extends Command
 
     if(!$hasActionService &&$this->checkExists($table)) {
     echo "✅ File Esiste\n";    
-    passthru("php bin/generate --action-api=$table");
+    passthru("php bin/generate --action-api=$table $stringSwagger");
     } else {
          echo "❌ File non esistono\n";
        if($hasDns) {
-         passthru("php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$serviceClass $stringPrefix --action-api=$table");
+         passthru("php bin/generate --dsn=$dsn --user=$user --pass=$pass --table=$serviceClass $stringPrefix --action-api=$table $stringSwagger");
        } else {
-         passthru("php bin/generate --table=$serviceClass $stringPrefix --action-api=$table");
+         passthru("php bin/generate --table=$serviceClass $stringPrefix --action-api=$table $stringSwagger");
        }
     }
 
