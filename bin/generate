@@ -65,7 +65,7 @@ foreach ($configFiles as $f) {
 // 2. Linea di comando
 // ──────────────────────────────────────────────────────────────────────────────
 
-$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-service:','action-api:', 'action-view:', 'with-view','not-view', 'with-route','not-route', 'with-api','with-service','class-dao', 'help']);
+$options = getopt('', ['dsn::', 'user::', 'pass::', 'table::', 'prefix::', 'action:', 'action-service:','action-api:', 'action-view:', 'with-view','not-view', 'with-route','not-route', 'with-api','with-service','with-swagger','class-dao', 'help']);
 $tableFilter = $options['table'] ?? null;
 
 if (isset($options['help'])) {
@@ -80,6 +80,7 @@ Opzioni:
   --action-service=SERVICE  Nome del service da usare per l'action se diverso dall'action (es. make:action login  --action-service=User)
   --table=TABLE     Genera classi solo per la tabella specificata
   --class-dao       Genera la abstract class Dao in src/Dao
+  --with-swagger    Genera annotazioni OpenApi (OAT) su Entity e API Rest
   --not-view        Non crea la view in automatico (associata all'Action)
   --not-route       Non crea l'endpoind nel router (associato all'Action)
   --help            Questo messaggio
@@ -94,7 +95,8 @@ Esempi:
    php banquet make:map all --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
    php banquet make:map corsi 
    php banquet make:map corsi full-action 
-   php banquet make:api corsi 
+   php banquet make:api corsi  
+   php banquet make:api corsi --with-swagger API con annotazioni OpenApi
    php banquet make:api <nome-api> --action-service=<nome-service> se diverso dall'nome api
    php banquet make:api corsi --prefix=tbl_ --dsn="mysql:host=localhost;dbname=test" --user=root --pass=root
    php banquet make:action corsi 
@@ -104,6 +106,7 @@ Esempi:
    php banquet --class-dao utile per generare la classe astratta Dao.php in src/Dao 
    php banquet --help
    php banquet --action-view=corsi  genera la view corsi in src/view/pages/corsi.php
+   php banquet make:map corsi full-action --with-api --with-swagger  genera Entity e API con annotazioni OpenApi
  
 HELP;
     exit(0);
@@ -132,6 +135,11 @@ $hasApiMode    = isset($options['action-api']);
 $hasViewMode   = isset($options['action-view']);
 $hasCustomMode = $hasActionMode || $hasApiMode || $hasViewMode;
 $hasTableMode  = !$hasCustomMode || isset($options['table']);
+$hasSwagger    = isset($options['with-swagger']);
+
+if ($hasSwagger) {
+    writeFile($API_DIR . "/OpenApiConfig.php", generateOpenApiConfigCode());
+}
 
 if ($hasTableMode) {
     try {
@@ -283,7 +291,16 @@ function toPascalCase(string $name, string $prefix = ''): string
 // 6. Generazione Entity
 // ──────────────────────────────────────────────────────────────────────────────
 
-function generateEntityCode(string $table, array $columns, string $prefix): string
+function columnToOAType(string $type): string
+{
+    $type = strtolower($type);
+    if (preg_match('/^(int|integer|tinyint|smallint|mediumint|bigint|serial)/', $type) || strpos($type, 'auto_increment') !== false) {
+        return "format: 'int64'";
+    }
+    return "type: 'string'";
+}
+
+function generateEntityCode(string $table, array $columns, string $prefix, bool $hasSwagger = false): string
 {
     $className  = toPascalCase($table, $prefix);
     $entityVar  = lcfirst($className);
@@ -293,9 +310,23 @@ function generateEntityCode(string $table, array $columns, string $prefix): stri
     $gettersSetters = '';
     $constants  = "\tconst VAR_CLASSNAME = \"{$className}\";\n";
 
+    $useOat = '';
+    $classAttr = '';
+    $propAttrs = [];
+
+    if ($hasSwagger) {
+        $useOat = "\nuse OpenApi\Attributes as OAT;\n";
+        $classAttr = "#[OAT\Schema(title: '{$className} Entity', description: '{$className} Entity')]\n";
+    }
+
     foreach ($columns as $col) {
         $field = $col['Field'];
-        $props .= "\tpublic \${$field};\n";
+        $oatProp = '';
+        if ($hasSwagger) {
+            $oatType = columnToOAType($col['Type'] ?? '');
+            $oatProp = "\t#[OAT\Property(title: '{$field}', description: '{$field}', {$oatType})]\n";
+        }
+        $props .= "{$oatProp}\tpublic \${$field};\n";
         $setBody .= "\t\t\$this->{$field}=isset(\$row[\"{$field}\"])?\$row[\"{$field}\"]:NULL;\n";
         $constants .= "\tconst COLUMN_" . strtoupper($field) . " = \"{$field}\";\n";
 
@@ -323,8 +354,8 @@ namespace Banquet\Entity;
  * @copyright MIT
  * Entity  {$className}
  */
-
-class {$className} {
+{$useOat}
+{$classAttr}class {$className} {
 
 {$props}
 \tpublic function __construct(\$row = NULL)
@@ -728,7 +759,7 @@ PHP;
 // 12. Generazione REST Api
 // ──────────────────────────────────────────────────────────────────────────────
 
-function generateApiCode(string $className, string $service = null): string
+function generateApiCode(string $className, string $service = null, bool $hasSwagger = false): string
 {
     $className  = toPascalCase($className, '');
     $entityVar    = lcfirst($className);
@@ -740,6 +771,173 @@ function generateApiCode(string $className, string $service = null): string
     $objectName  = toPascalCase($objectName, '');
     $getByIdMethod = 'get' . $objectName . 'ById';
     $getAllMethod  = 'getAll' . $objectName;
+    $routeName = strtolower($entityVar);
+
+    $useOat = '';
+    $getAllAttr = '';
+    $getByIdAttr = '';
+    $getInsertAttr = '';
+    $getUpdateAttr = '';
+    $getDeleteAttr = '';
+    $idParamType = '$id = null';
+    $deleteIdParamType = '$id=null';
+
+    if ($hasSwagger) {
+        $useOat = "use OpenApi\Attributes as OAT;\n\n";
+
+        $getAllAttr = <<<OAT
+       #[OAT\Get(path: '/api/{$routeName}',
+        operationId: 'getAll{$routeName}',
+        summary: 'Get {$routeName}',
+        tags: ['{$routeName}'], responses: [
+        new OAT\Response(
+            response: 200,
+            description: 'successful operation',
+            content: [
+                new OAT\JsonContent(
+                    ref: {$objectName}::class
+                )
+            ]
+        ),
+        new OAT\Response(
+            response: 404,
+            description: '{$className} not found'
+        ),
+        new OAT\Response(
+            response: 500,
+            description: 'Internal Server Error'
+        )
+    ])]
+OAT;
+
+        $getByIdAttr = <<<OAT
+        #[OAT\Get(path: '/api/{$routeName}/{id}',
+        operationId: 'getById{$routeName}',
+        summary: 'Get {$routeName} by id',
+        parameters: [
+        new OAT\PathParameter(
+            name: 'id',
+            required: true,
+            schema: new OAT\Schema(
+                type: 'string'
+            )
+        ),
+    ],tags: ['{$routeName}'], responses: [
+        new OAT\Response(
+            response: 200,
+            description: 'successful operation',
+            content: [
+                new OAT\JsonContent(
+                    ref: {$objectName}::class
+                )
+            ]
+        ),
+        new OAT\Response(
+            response: 404,
+            description: '{$className} not found'
+        ),
+        new OAT\Response(
+            response: 500,
+            description: 'Internal Server Error'
+        )
+    ])]
+OAT;
+
+        $getInsertAttr = <<<OAT
+  #[OAT\Post(path: '/api/{$routeName}', operationId: 'getInsert{$routeName}',
+        description: 'Creazione di un nuovo {$routeName}.',
+        summary: 'Create {$routeName}',
+        requestBody: new OAT\RequestBody(
+        description: 'Create {$routeName} object',
+        required: true,
+        content: new OAT\JsonContent(
+            ref: {$objectName}::class
+        )
+    ), tags: ['{$routeName}'], responses: [
+        new OAT\Response(
+            response: 201,
+            description: 'successful operation'
+        ),
+        new OAT\Response(
+            response: 401,
+            description: 'Autenticazione richiesta'
+        ),
+        new OAT\Response(
+            response: 500,
+            description: 'Internal Server Error'
+        )
+    ])]
+OAT;
+
+        $getUpdateAttr = <<<OAT
+    #[OAT\Put(path: '/api/{$routeName}', operationId: 'getUpdate{$routeName}',
+        description: 'This can only be done by the logged in user.',
+        summary: 'Update user',
+        requestBody: new OAT\RequestBody(
+        description: 'Updated user object',
+        required: true,
+        content: new OAT\JsonContent(
+            ref: {$objectName}::class
+        )
+    ),tags: ['{$routeName}'], responses: [
+        new OAT\Response(
+            response: 200,
+            description: 'successful operation',
+            content: [
+                new OAT\JsonContent(
+                    ref: {$objectName}::class
+                )
+            ]
+        ),
+        new OAT\Response(
+            response: 401,
+            description: 'Autenticazione richiesta'
+        ),
+        new OAT\Response(
+            response: 404,
+            description: '{$className} not found'
+        ),
+        new OAT\Response(
+            response: 500,
+            description: 'Internal Server Error'
+        )
+    ])]
+OAT;
+
+        $getDeleteAttr = <<<OAT
+    #[OAT\Delete(path: '/api/{$routeName}/{id}', operationId: 'getDelete{$routeName}',
+    description: 'This can only be done by the logged in user.',
+    summary: 'Delete user',
+    parameters: [
+        new OAT\Parameter(
+            name: 'id',
+            description: 'The name that needs to be deleted',
+            in: 'path',
+            required: true,
+            schema: new OAT\Schema(
+                type: 'string'
+            )
+        ),
+    ],tags: ['{$routeName}'], responses: [
+         new OAT\Response(
+            response: 204,
+            description: 'successful operation',
+            content: []
+        ),
+        new OAT\Response(
+            response: 401,
+            description: 'Autenticazione richiesta'
+        ),
+        new OAT\Response(
+            response: 500,
+            description: 'Internal Server Error'
+        )
+    ])]
+OAT;
+
+        $idParamType = '$id';
+        $deleteIdParamType = '$id';
+    }
 
     return <<<PHP
 <?php
@@ -757,14 +955,14 @@ use Banquet\Service\\{$serviceClass};
 use Banquet\Entity\\{$objectName};
 use Banquet\Core\Log;
 
-class {$apiClass} extends SenderAction
+{$useOat}class {$apiClass} extends SenderAction
 {
     private \$service;
     public function __construct({$serviceClass} \$service) {
         \$this->service=\$service;
     }
 
-
+       {$getAllAttr}
     public function getAll():void
     {
         try {
@@ -778,8 +976,8 @@ class {$apiClass} extends SenderAction
 
     }
 
-
-    public function getById(\$id = null):void
+        {$getByIdAttr}
+    public function getById({$idParamType}):void
     {
         try {
             Log::writeInfo('{$apiClass}: called-> getById: ' . \$id);
@@ -791,7 +989,7 @@ class {$apiClass} extends SenderAction
         }
 
     }
-
+  {$getInsertAttr}
     public function getInsert():void
     {
         try {
@@ -813,7 +1011,7 @@ class {$apiClass} extends SenderAction
         }
 
     }
-
+    {$getUpdateAttr}
     public function getUpdate():void
     {
         try {
@@ -835,8 +1033,8 @@ class {$apiClass} extends SenderAction
 
     }
 
-
-    public function getDelete(\$id=null):void
+    {$getDeleteAttr}
+    public function getDelete({$deleteIdParamType}):void
     {
         try {
             // Gestisce entrambe le validazioni: jWT Bearer e credenziali di accesso Basic Auth
@@ -859,10 +1057,85 @@ class {$apiClass} extends SenderAction
     public function send()
     {
    /* Questo metodo non è necessario per le API REST, ma è richiesto dalla classe base SenderAction.
-    * Puoi lasciarlo vuoto o implementare una logica di default se necessario.
-    *   \$this->respondNotFound('Endpoint non trovato.');
-    */
+     * Puoi lasciarlo vuoto o implementare una logica di default se necessario.
+     *   \$this->respondNotFound('Endpoint non trovato.');
+     */
     }
+
+}
+
+PHP;
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// 12b. Generazione OpenApiConfig
+// ──────────────────────────────────────────────────────────────────────────────
+
+function generateOpenApiConfigCode(): string
+{
+    $date = date('d/m/Y H:i:s');
+
+    return <<<PHP
+<?php
+
+/**
+ * Generated {$date}
+ * Auto-generated tools banquet (https://github.com/mssalvo/banquet)
+ * @copyright MIT
+ * Api-Rest  OpenApiConfig
+ */
+
+namespace Banquet\Actions\Api;
+
+use OpenApi\Attributes as OAT;
+
+#[OAT\OpenApi(openapi: OAT\OpenApi::VERSION_3_1_0, security: [['bearerAuth' => []]])]
+#[OAT\Info(
+    version: '1.0.0',
+    title: 'Basic single file API',
+    attachables: [new OAT\Attachable()]
+)]
+#[OAT\License(name: 'MIT', identifier: 'MIT')]
+#[OAT\Server(url: 'http://localhost:8000', description: 'API server')]
+#[OAT\SecurityScheme(securityScheme: 'bearerAuth', type: 'http', description: 'Basic Auth', scheme: 'bearer')]
+#[OAT\Tag(name: 'accesso', description: 'Genera token jwt per accesso ai metodi')]
+class OpenApiConfig
+{
+
+
+  #[OAT\Post(path: '/api/login', operationId: 'getLogin',
+          description: 'Login, token per accesso api.',
+          summary: 'Login genera token jwt utente',
+          requestBody: new OAT\RequestBody(
+          description: 'Create Token JWT object',
+            required: true,
+            content: new OAT\JsonContent(
+                 properties: [
+                     new OAT\Property(
+                         property: "username",
+                         type: "string",
+                         example: "banquet"
+                     ),
+                     new OAT\Property(
+                         property: "password",
+                         type: "string",
+                         example: "banquet"
+                     )
+                 ]
+
+            )
+        ), tags: ['accesso'], responses: [
+            new OAT\Response(
+                response: 201,
+                description: 'successful operation'
+            ),
+            new OAT\Response(
+                response: 500,
+                description: 'Internal Server Error'
+            )
+        ])]
+    public function getLogin()
+    {  }
 
 }
 
@@ -1146,7 +1419,7 @@ if ($hasTableMode) {
 
         // Entity
         $className = toPascalCase($table, $prefix);
-        $code = generateEntityCode($table, $columns, $prefix);
+        $code = generateEntityCode($table, $columns, $prefix, $hasSwagger);
         writeFile($ENTITY_DIR . "/{$className}.php", $code);
         $created[] = ['type' => 'Entity', 'path' => $ENTITY_DIR . "/{$className}.php", 'name' => $className];
 
@@ -1204,7 +1477,7 @@ if ($hasActionMode) {
     // REST Api
     if ($withApi && !$hasActionService) {
 
-        $code = generateApiCode($actionName);
+        $code = generateApiCode($actionName, null, $hasSwagger);
         writeFile($API_DIR . "/{$actionName}Rest.php", $code);
         $created[] = ['type' => 'Api', 'path' => $API_DIR . "/{$actionName}Rest.php", 'name' => $actionName];
 
@@ -1214,7 +1487,7 @@ if ($hasActionMode) {
     }
      if ($withApi && $hasActionService) {
         $actionService = preg_replace('/Service$/', '', $options['action-service']);
-        $code = generateApiCode($actionName, $actionService);
+        $code = generateApiCode($actionName, $actionService, $hasSwagger);
         writeFile($API_DIR . "/{$actionName}Rest.php", $code);
         $created[] = ['type' => 'Api', 'path' => $API_DIR . "/{$actionName}Rest.php", 'name' => $actionName];
 
@@ -1252,7 +1525,7 @@ if ($hasApiMode) {
     echo "━━━ API: {$apiName} ━━━\n";
    
     $serviceApiName = $hasActionService ? preg_replace('/Service$/', '', $options['action-service']) : null;
-    $code = generateApiCode($apiName,$serviceApiName);
+    $code = generateApiCode($apiName, $serviceApiName, $hasSwagger);
     writeFile($API_DIR . "/{$apiName}Rest.php", $code);
     $created[] = ['type' => 'Api', 'path' => $API_DIR . "/{$apiName}Rest.php", 'name' => $apiName];
   
