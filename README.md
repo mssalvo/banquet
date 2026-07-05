@@ -5,8 +5,8 @@
 <h1 align="center">Banquet</h1>
 
 <p align="center">
-  <strong>Micro-framework PHP + code generator. Da tabella DB a API funzionante in pochi secondi.</strong>
-  <strong><br>Banquet è uno strumento PHP che accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route), lasciando al developer la libertà di costruire il resto come preferisce
+  <strong>Banquet MVC Tool PHP + code generator. Da tabella DB a API funzionante in pochi secondi.</strong>
+  <strong><br>Accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route), lasciando al developer la libertà di costruire il resto come preferisce
   </strong>
   <br>
   MVC · DI Container · Routing · Generatore automatico · API REST
