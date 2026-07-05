@@ -217,10 +217,17 @@ function getColumns(PDO $pdo, string $table): array
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         case 'pgsql':
             $stmt = $pdo->query("
-                SELECT column_name AS \"Field\", data_type AS \"Type\"
-                FROM information_schema.columns
-                WHERE table_name = '{$table}'
-                ORDER BY ordinal_position
+                SELECT c.column_name AS \"Field\", c.data_type AS \"Type\",
+                       CASE WHEN pk.column_name IS NOT NULL THEN 'PRI' ELSE '' END AS \"Key\"
+                FROM information_schema.columns c
+                LEFT JOIN (
+                    SELECT kcu.column_name
+                    FROM information_schema.table_constraints tc
+                    JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
+                    WHERE tc.table_name = '{$table}' AND tc.constraint_type = 'PRIMARY KEY'
+                ) pk ON c.column_name = pk.column_name
+                WHERE c.table_name = '{$table}'
+                ORDER BY c.ordinal_position
             ");
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         case 'sqlite':
@@ -228,15 +235,22 @@ function getColumns(PDO $pdo, string $table): array
             $cols = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $result = [];
             foreach ($cols as $c) {
-                $result[] = ['Field' => $c['name'], 'Type' => $c['type']];
+                $result[] = ['Field' => $c['name'], 'Type' => $c['type'], 'Key' => $c['pk'] ? 'PRI' : ''];
             }
             return $result;
         case 'sqlsrv':
             $stmt = $pdo->query("
-                SELECT COLUMN_NAME AS \"Field\", DATA_TYPE AS \"Type\"
-                FROM INFORMATION_SCHEMA.COLUMNS
-                WHERE TABLE_NAME = '{$table}'
-                ORDER BY ORDINAL_POSITION
+                SELECT c.COLUMN_NAME AS \"Field\", c.DATA_TYPE AS \"Type\",
+                       CASE WHEN pk.column_name IS NOT NULL THEN 'PRI' ELSE '' END AS \"Key\"
+                FROM INFORMATION_SCHEMA.COLUMNS c
+                LEFT JOIN (
+                    SELECT kcu.COLUMN_NAME AS column_name
+                    FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS tc
+                    JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON tc.CONSTRAINT_NAME = kcu.CONSTRAINT_NAME
+                    WHERE tc.TABLE_NAME = '{$table}' AND tc.CONSTRAINT_TYPE = 'PRIMARY KEY'
+                ) pk ON c.COLUMN_NAME = pk.column_name
+                WHERE c.TABLE_NAME = '{$table}'
+                ORDER BY c.ORDINAL_POSITION
             ");
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         default:
@@ -348,7 +362,13 @@ function generateDaoCode(string $table, array $columns, string $prefix): string
     $colList  = implode(",\n\t\t\t\t", $colNames);
     $placeholders = implode(',', array_fill(0, count($colNames), '?'));
 
-    $idCol = $colNames[0];  // prima colonna = chiave primaria
+    $idCol = $colNames[0];  // fallback: prima colonna
+    foreach ($columns as $col) {
+        if (isset($col['Key']) && $col['Key'] === 'PRI') {
+            $idCol = $col['Field'];
+            break;
+        }
+    }
 
     $setFields = '';
     $updateSet = '';
