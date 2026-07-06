@@ -8,7 +8,6 @@
 namespace Banquet\Core;
 
 
-use Banquet\Actions\Notfound\Notfound;
 use Banquet\Core\Log;
 
 class Action {
@@ -34,20 +33,8 @@ class Action {
  
 
     public static function getAction() {
-
-
-         $router = require_once DIR_APP.'/src/routes/web.php';
-
-          $action = $router->dispatch();
  
-        if (!is_string($action) || !class_exists($action)) {
-            http_response_code(404);
-            $action = Notfound::class;
-        }
-
-        Log::writeInfo('Action resolved: ' . $action);
-
-        return $action;
+        return '';
     }
  
 }

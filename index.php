@@ -39,7 +39,7 @@
 	\Banquet\Core\Factory::setResponse($response);
 
 
-	\Banquet\Core\Factory::output(\Banquet\Core\Action::getAction());
+	\Banquet\Core\Factory::execute();// output(\Banquet\Core\Action::getAction());
  
  
      

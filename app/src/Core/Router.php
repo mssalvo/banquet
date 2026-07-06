@@ -69,7 +69,8 @@ class Router
             'pattern' => $pattern,
             'action' => $action,
             'execute' => 'send',
-            'middleware' => []
+            'middleware' => [],
+            'params' => []
         ];
 
         $this->routes[] = &$route;
@@ -124,8 +125,9 @@ class Router
                 $params = [];
                 foreach ($paramNames as $index => $name) {
                     $params[$name] = $matches[$index] ?? null;
+                    $route['params'][$name]=$matches[$index] ?? null;
                 }
-
+                  
                 // Salva parametri globali
                 $_REQUEST['_route_params'] = $params;
 
@@ -134,13 +136,9 @@ class Router
                     $this->runMiddleware($mw);
                 }
 
-                if (isset($route['action']) && isset($route['execute']) && $route['execute'] != null) {
-                    
-                  return $this->runApi($route, $params);
-                  
-                }
+  
 
-                return $route['action'];
+                return $route;
             }
         }
 
@@ -189,25 +187,11 @@ class Router
                     exit;
                 }
                 break;
-
+                
             // puoi aggiungere altri middleware qui
             default:
                 break;
         }
     }
 
-    private function runApi($route, $params=[])
-    {
-         $ction = $route['action'];
-         $execute = $route['execute'];
-        
-        if ($execute != null && class_exists($ction)) {
-            $controller = resolve($ction);
-            if (method_exists($controller, $execute)) { 
-                call_user_func_array([$controller, $execute], $params);
-            }
-        }
-
-        return $ction;
-    }
 }

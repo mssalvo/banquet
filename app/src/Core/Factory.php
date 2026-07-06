@@ -5,6 +5,7 @@
  *
  * @author Salvatore Mariniello
  */
+
 namespace Banquet\Core;
 
 /**
@@ -14,10 +15,15 @@ namespace Banquet\Core;
 use Banquet\Actions\Error\ErrorRest;
 use Banquet\Core\Log;
 use Banquet\Actions\Error\Error;
+use Banquet\Actions\Notfound\Notfound;
 use Exception;
- 
+use InvalidArgumentException;
+use ReflectionMethod;
+use ReflectionNamedType;
+use ReflectionParameter;
 
-class Factory {
+class Factory
+{
 
     private $data = array();
     private static $factory;
@@ -26,13 +32,14 @@ class Factory {
     private $response = NULL;
     private static $MODELCLS = "Model";
     private $container = NULL;
-    public function __construct() {
+    public function __construct()
+    {
 
         self::$factory = $this;
-
     }
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
 
         if (!isset(self::$factory)) {
             self::$factory = new Factory();
@@ -40,62 +47,73 @@ class Factory {
         return self::$factory;
     }
 
-    public static function getResponse() {
+    public static function getResponse()
+    {
         if (self::getInstance()->response == NULL) {
             self::getInstance()->response = new Response();
         }
         return self::getInstance()->response;
     }
-    public static function getContainer() {
+    public static function getContainer()
+    {
         if (self::getInstance()->container == NULL) {
             self::getInstance()->container = app();
         }
         return self::getInstance()->container;
     }
 
-    public static function setContainer($container) {
+    public static function setContainer($container)
+    {
         self::getInstance()->container = $container;
     }
 
-    public static function setResponse($response) {
+    public static function setResponse($response)
+    {
         self::getInstance()->response = $response;
     }
 
-    public static function get($key) {
+    public static function get($key)
+    {
         return (isset(self::getInstance()->data[$key]) ? self::getInstance()->data[$key] : NULL);
     }
 
-    public static function set($key, $value) {
+    public static function set($key, $value)
+    {
         self::getInstance()->data[$key] = $value;
     }
 
 
-    public static function getActions() {
+    public static function getActions()
+    {
         return self::getInstance()->actions;
     }
 
-    public static function getAction($key) {
+    public static function getAction($key)
+    {
         return (isset(self::getInstance()->actions[$key]) ? self::getInstance()->actions[$key] : NULL);
     }
 
-    public static function setAction($key, $value) {
+    public static function setAction($key, $value)
+    {
         self::getInstance()->actions[$key] = $value;
     }
 
-    public static function setActions($childs) {
+    public static function setActions($childs)
+    {
         self::getInstance()->actions = $childs;
     }
 
-    public static function setMasterTemplate($master) {
+    public static function setMasterTemplate($master)
+    {
         self::getInstance()->master_template = $master;
     }
 
-    public static function output($action = NULL, $children = NULL) {
+    public static function output($action = NULL, $children = NULL)
+    {
         if ($children !== NULL) {
             self::setActions($children);
-           
-        } 
-         
+        }
+
         if ($action !== NULL) {
             $output = self::getInstance()->getOutput($action);
             if (self::getInstance()->master_template !== NULL) {
@@ -128,55 +146,198 @@ class Factory {
 
             self::getResponse()->setOutput($output);
             self::getResponse()->output();
-           
         } else {
-             Log::writeError('Method:output:: Impossibile caricare il template ' . $template . '!'); 
-           
-            throw new Exception("Method:output:: Impossibile caricare il template " .$template ."!");
-          
+            Log::writeError('Method:output:: Impossibile caricare il template ' . $template . '!');
+
+            throw new Exception("Method:output:: Impossibile caricare il template " . $template . "!");
         }
     }
 
 
-    private function getOutput($actionClass) {
+        private function getOutput($actionClass)
+    {
 
 
         if (self::getInstance()->container == NULL) {
             self::getInstance()->container = app();
         }
- 
+
         try {
-            
+
             $action = self::getInstance()->container->get($actionClass);
             return $action->send();
-
         } catch (Exception $e) {
-            Log::writeError("metod:getOutput:: ". $e->getMessage());
-   
-            if (strpos($actionClass,"Api")!=0) {
-            $action = self::getInstance()->container->get(ErrorRest::class);
-            $action->varAdd("error",json_encode(['esito'=>'error','message'=>$e->getMessage()]));
-            return $action->send();
-            }else{
-            $action = self::getInstance()->container->get(Error::class);
-            $action->varAdd("error",$e->getMessage());
-            return $action->send();   
+            Log::writeError("metod:getOutput:: " . $e->getMessage());
+
+            if (strpos($actionClass, "Api") != 0) {
+                $action = self::getInstance()->container->get(ErrorRest::class);
+                $action->varAdd("error", json_encode(['esito' => 'error', 'message' => $e->getMessage()]));
+                return $action->send();
+            } else {
+                $action = self::getInstance()->container->get(Error::class);
+                $action->varAdd("error", $e->getMessage());
+                return $action->send();
             }
-    }
+        }
     }
 
-    public static function has($key) {
+
+    public static function execute()
+    {
+
+        $router = require_once DIR_APP . '/src/routes/web.php';
+        
+        $root = $router->dispatch();
+        
+        $action = '';
+        if (is_array($root) && $root['execute'] == "send") {
+            $action = $root['action'];
+            if (!is_string($action) || !class_exists($action)) {
+                http_response_code(404);
+                $action = Notfound::class;
+            }
+
+            Log::writeInfo('Action resolved: ' . $action);
+            self::getInstance()->output($action);
+
+        } elseif (is_array($root) && $root['execute'] != "send") {
+
+            $action = $root['action'];
+
+            if (self::getInstance()->container == NULL) {
+                self::getInstance()->container = app();
+            }
+
+            try {
+             
+                $params = isset($root['params']) && is_array($root['params']) ? $root['params'] : [];
+             
+                $actionClass = self::getInstance()->container->get($action);
+
+                $methodName = $root['execute'];
+
+                
+                if(!method_exists($actionClass, $methodName)){
+                Log::writeError('execute::method:: '.$root['execute']. ' Metodo '. $methodName .' non trovato in ' . $action );
+                self::getInstance()->getJsonResponse(404,['esito' => 'error', 'message' => "Metodo {$methodName} non trovato in " . $action ]);   
+                }
+
+                $method = new ReflectionMethod($actionClass, $methodName);
+
+               
+
+                if ($method->getNumberOfParameters() > 0) {
+ 
+                   $args = self::getInstance()->buildArguments($method, $params);
+                    $method->invokeArgs($actionClass, $args);
+
+                } else {
+                    $method->invoke($actionClass);
+                }
+            } catch (InvalidArgumentException $e) {
+                 Log::writeError('execute::method:: '.$root['execute']. ' InvalidArgumentException:  ' . $e->getMessage());
+                    self::getInstance()->getJsonResponse(500,['esito' => 'error', 'message' => $e->getMessage()]);
+                 } catch (Exception $e) {
+                 Log::writeError('execute::method:: '.$root['execute'].' Exception: ' . $e->getMessage());
+                 self::getInstance()->getJsonResponse(500,['esito' => 'error', 'message' => $e->getMessage()]);
+             }
+        }
+
+
+        return $action;
+    }
+
+
+    function buildArguments(
+        ReflectionMethod $method,
+        array $input
+    ): array {
+        $args = [];
+ 
+        foreach ($method->getParameters() as $parameter) {
+
+            $value = $input[$parameter->getName()] ?? null;
+                 
+          if ($parameter->isDefaultValueAvailable() && $value === null) {
+                $args[$parameter->getName()] = $parameter->getDefaultValue();
+                continue;
+            } 
+            try {
+
+                $args[$parameter->getName()] = self::getInstance()->convertValue($value, $parameter);
+                  Log::writeInfo("2convertValue:: args ");
+            } catch (InvalidArgumentException $e) {
+                throw new InvalidArgumentException($e->getMessage());
+            }
+        }
+
+        return $args;
+    }
+
+
+    function convertValue( mixed $value, ReflectionParameter $parameter):mixed
+    {
+        $type = $parameter->getType();
+
+        // Nessun type hint => restituisco il valore così com'è
+        if (!$type instanceof ReflectionNamedType) {
+            Log::writeInfo("convertValue:: type" . $type);
+                return $value;
+        }
+
+        return match ($type->getName()) {
+            'int' => filter_var($value, FILTER_VALIDATE_INT) !== false
+                ? (int)$value
+                : throw new InvalidArgumentException(
+                    "Il parametro {$parameter->getName()} deve essere un int"
+                ),
+
+            'string' => (string)$value,
+
+            'float' => is_numeric($value)
+                ? (float)$value
+                : throw new InvalidArgumentException(
+                    "Il parametro {$parameter->getName()} deve essere un float"
+                ),
+
+            'bool' => filter_var(
+                $value,
+                FILTER_VALIDATE_BOOLEAN,
+                FILTER_NULL_ON_FAILURE
+            ) ?? throw new InvalidArgumentException(
+                "Il parametro {$parameter->getName()} deve essere un bool"
+            ),
+
+            default => $value
+        };
+    }
+
+     protected function getJsonResponse(int $statusCode, $data = null)
+    {
+        if (ob_get_length()) {
+            ob_clean();
+        }
+
+        header('Content-Type: application/json; charset=utf-8');
+        http_response_code($statusCode);
+
+        if ($data !== null) {
+            echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+        exit;
+    }
+
+    public static function has($key)
+    {
         return isset(self::getInstance()->data[$key]);
     }
 
-    public function __destruct() {
-    
-    }
+    public function __destruct() {}
 
-    public static function getTemplate($data, $template = NULL, $children = NULL, $master_template = NULL) {
+    public static function getTemplate($data, $template = NULL, $children = NULL, $master_template = NULL)
+    {
         if ($children !== NULL) {
             self::setActions($children);
-
         }
         if ($template == NULL) {
             Log::writeInfo("Factory Method>getTemplate template-> NULL");
@@ -187,9 +348,8 @@ class Factory {
 
         if ($master_template !== NULL) {
             self::getInstance()->master_template = $master_template;
-
         }
-        
+
         if (file_exists(DIR_TEMPLATE . $template)) {
 
             extract($data);
@@ -204,17 +364,17 @@ class Factory {
 
             return $output;
         } else {
-             Log::writeError('Impossibile caricare il template ' . DIR_TEMPLATE . $template . '!'); 
-          
-             throw new Exception("Method:getTemplate:: Impossibile caricare il template " .$template ."!");
-           
+            Log::writeError('Impossibile caricare il template ' . DIR_TEMPLATE . $template . '!');
+
+            throw new Exception("Method:getTemplate:: Impossibile caricare il template " . $template . "!");
         }
     }
 
-    private static function getName($template) {
+    private static function getName($template)
+    {
 
         if (!self::strContains($template, TEMPLATE_EXT, true)) {
-            $template .=TEMPLATE_EXT;
+            $template .= TEMPLATE_EXT;
         }
 
         return $template;
@@ -236,7 +396,8 @@ class Factory {
         return basename($name);
     }
 
-    private static function strContains($haystack, $needle, $ignoreCase = false) {
+    private static function strContains($haystack, $needle, $ignoreCase = false)
+    {
         if ($ignoreCase) {
             $haystack = strtolower($haystack);
             $needle = strtolower($needle);
@@ -245,14 +406,16 @@ class Factory {
         return ($needlePos === false ? false : ($needlePos + 1));
     }
 
-    public static function ensureDir($dir) {
+    public static function ensureDir($dir)
+    {
         if (!is_dir($dir)) {
             return mkdir($dir, 0777, true);
         }
         return false;
     }
 
-    public static function writeToFile($path, $val) {
+    public static function writeToFile($path, $val)
+    {
         $file_ = fopen($path, "a+");
         if ($file_) {
             fwrite($file_, $val . "\n");
@@ -260,10 +423,8 @@ class Factory {
         }
     }
 
-    public static function renameDir($name_dir, $newNamedir) {
+    public static function renameDir($name_dir, $newNamedir)
+    {
         return rename($name_dir, $newNamedir);
     }
-
 }
-
-?>
