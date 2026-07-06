@@ -32,7 +32,8 @@ class MakeApiCommand extends Command
                 if ($hasSwagger) {
                 $stringSwagger=' --with-swagger';
                 }
-
+                
+         $stringPrefix='';
          $hasPrefix  = isset($arra_associativo['prefix']);
 
         if ($hasPrefix) {
