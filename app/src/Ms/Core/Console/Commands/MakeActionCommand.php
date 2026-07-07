@@ -6,9 +6,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Banquet\Core\Console\Commands;
+namespace Banquet\Ms\Core\Console\Commands;
 
-use Banquet\Core\Console\Command;
+use Banquet\Ms\Core\Console\Command;
 
 class MakeActionCommand extends Command
 {

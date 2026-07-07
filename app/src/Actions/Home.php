@@ -8,7 +8,8 @@
 
 
 namespace Banquet\Actions;
-use Banquet\Core\SenderAction;
+use Banquet\Ms\Core\Attribute\Route;
+use Banquet\Ms\Core\SenderAction;
 
 class Home extends SenderAction{
    	 
@@ -16,7 +17,8 @@ class Home extends SenderAction{
     public function __construct() {
    
       }
- 
+        #[Route('/', 'GET')]
+        #[Route('/home', 'GET')]
         public function send() {
             
         $this->setTemplateName('pages/home');

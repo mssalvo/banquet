@@ -1,9 +1,9 @@
 <?php
 
-namespace Banquet\Core;
+namespace Banquet\Ms\Core;
 
-use Banquet\Core\Log;
-use Banquet\Core\Jwt\JwtService;
+use Banquet\Ms\Core\Log;
+use Banquet\Ms\Core\Jwt\JwtService;
 
 abstract class ActionRestAuthorization 
 {

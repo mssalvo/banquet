@@ -6,14 +6,14 @@
  * @author Salvatore Mariniello
  */
 
-namespace Banquet\Core;
+namespace Banquet\Ms\Core;
 
 /**
  * @property Container|null $container
  */
 
 use Banquet\Actions\Error\ErrorRest;
-use Banquet\Core\Log;
+use Banquet\Ms\Core\Log;
 use Banquet\Actions\Error\Error;
 use Banquet\Actions\Notfound\Notfound;
 use Exception;
@@ -30,7 +30,6 @@ class Factory
     private $actions = array();
     private $master_template = NULL;
     private $response = NULL;
-    private static $MODELCLS = "Model";
     private $container = NULL;
     public function __construct()
     {
@@ -182,13 +181,12 @@ class Factory
     }
 
 
-    public static function execute()
+    public static function execute($root_obj)
     {
 
-        $router = require_once DIR_APP . '/src/routes/web.php';
-        
-        $root = $router->dispatch();
-        
+     
+        $root =$root_obj;
+        //var_dump($root);
         $action = '';
         if (is_array($root) && $root['execute'] == "send") {
             $action = $root['action'];
@@ -265,7 +263,7 @@ class Factory
             try {
 
                 $args[$parameter->getName()] = self::getInstance()->convertValue($value, $parameter);
-                  Log::writeInfo("2convertValue:: args ");
+                 
             } catch (InvalidArgumentException $e) {
                 throw new InvalidArgumentException($e->getMessage());
             }
@@ -285,31 +283,43 @@ class Factory
                 return $value;
         }
 
-        return match ($type->getName()) {
-            'int' => filter_var($value, FILTER_VALIDATE_INT) !== false
-                ? (int)$value
-                : throw new InvalidArgumentException(
+        $typeName = $type->getName();
+        switch ($typeName) {
+            case 'int':
+                if (filter_var($value, FILTER_VALIDATE_INT) !== false) {
+                    return (int)$value;
+                }
+                throw new InvalidArgumentException(
                     "Il parametro {$parameter->getName()} deve essere un int"
-                ),
+                );
 
-            'string' => (string)$value,
+            case 'string':
+                return (string)$value;
 
-            'float' => is_numeric($value)
-                ? (float)$value
-                : throw new InvalidArgumentException(
+            case 'float':
+                if (is_numeric($value)) {
+                    return (float)$value;
+                }
+                throw new InvalidArgumentException(
                     "Il parametro {$parameter->getName()} deve essere un float"
-                ),
+                );
 
-            'bool' => filter_var(
-                $value,
-                FILTER_VALIDATE_BOOLEAN,
-                FILTER_NULL_ON_FAILURE
-            ) ?? throw new InvalidArgumentException(
-                "Il parametro {$parameter->getName()} deve essere un bool"
-            ),
+            case 'bool':
+                $boolValue = filter_var(
+                    $value,
+                    FILTER_VALIDATE_BOOLEAN,
+                    FILTER_NULL_ON_FAILURE
+                );
+                if ($boolValue === null) {
+                    throw new InvalidArgumentException(
+                        "Il parametro {$parameter->getName()} deve essere un bool"
+                    );
+                }
+                return $boolValue;
 
-            default => $value
-        };
+            default:
+                return $value;
+        }
     }
 
      protected function getJsonResponse(int $statusCode, $data = null)

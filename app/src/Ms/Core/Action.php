@@ -5,10 +5,10 @@
  *
  * @author Salvatore Mariniello
  */
-namespace Banquet\Core;
+namespace Banquet\Ms\Core;
 
 
-use Banquet\Core\Log;
+use Banquet\Ms\Core\Log;
 
 class Action {
 

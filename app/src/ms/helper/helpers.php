@@ -65,6 +65,9 @@ function redirect($url)
     exit;
 }
 
+function call_user_class_method($callable, ...$params) {
+    return $callable(...$params);
+}
 
 function user()
 {

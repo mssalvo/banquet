@@ -6,8 +6,12 @@
  * @author Utente
  */
 namespace Banquet\Actions;
-use \Banquet\Core\SenderAction;
-use Banquet\Core\Log;
+
+use Banquet\Ms\Core\Attribute\Route;
+use Banquet\Ms\Core\SenderAction;
+use Banquet\Ms\Core\Log;
+use Banquet\Model\LoginModel; 
+
 class Login extends SenderAction{
 
     private $model;
@@ -15,10 +19,11 @@ class Login extends SenderAction{
     private $password;
     
    
-    public function __construct(\Banquet\Model\Login $model) {
+    public function __construct(LoginModel $model) {
         $this->model = $model;
     }
-
+    #[Route(FOLDER_HOME.'/login', 'GET')]
+    #[Route(FOLDER_HOME.'/login', 'POST')]
     public function send() {
 
         $this->setTemplateName("pages/login");

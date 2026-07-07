@@ -5,7 +5,7 @@
  *
  * @author Salvatore Mariniello
  */
-namespace Banquet\Core;
+namespace Banquet\Ms\Core;
 
 class Load {
 

@@ -8,14 +8,16 @@
  */
 
 namespace Banquet\Actions\Documentazione;
-use \Banquet\Core\SenderAction;
+use Banquet\Ms\Core\Attribute\Route;
+use Banquet\Ms\Core\SenderAction;
 use Banquet\Actions\Header\Header;
 use Banquet\Actions\Menu\Menu;  
 use Banquet\Actions\Footer\Footer;
 
 class Rest extends SenderAction
 {
-
+    
+    #[Route(FOLDER_HOME.'/rest', 'GET')]
     public function send()
     {
 

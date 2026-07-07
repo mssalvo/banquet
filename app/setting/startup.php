@@ -5,8 +5,8 @@
 error_reporting(E_ALL);
 
 // Check Version
-if (version_compare(phpversion(), '7.4.0', '<') == true) {
-	exit('PHP7.4+ Required');
+if (version_compare(phpversion(), '8.0.0', '<') == true) {
+	exit('PHP8.0+ Required');
 }
 
 // Register Globals

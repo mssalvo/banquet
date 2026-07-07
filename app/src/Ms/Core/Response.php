@@ -1,5 +1,5 @@
 <?php
-namespace Banquet\Core;
+namespace Banquet\Ms\Core;
 
 class Response {
 	private $headers = array(); 
