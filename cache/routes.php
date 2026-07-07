@@ -12,21 +12,6 @@ return array (
       'controller' => 'Banquet\\Actions\\Api\\CorsiRest',
       'metodo' => 'getById',
     ),
-    '/utenti' => 
-    array (
-      'controller' => 'Banquet\\Actions\\Api\\UserController',
-      'metodo' => 'lista',
-    ),
-    '/utenti/{id}' => 
-    array (
-      'controller' => 'Banquet\\Actions\\Api\\UserController',
-      'metodo' => 'mostra',
-    ),
-    '/utenti/{id}/foto/{fotoId}' => 
-    array (
-      'controller' => 'Banquet\\Actions\\Api\\UserController',
-      'metodo' => 'foto',
-    ),
     '/api/login' => 
     array (
       'controller' => 'Banquet\\Actions\\Auth\\LoginAuthRest',
@@ -94,11 +79,6 @@ return array (
     array (
       'controller' => 'Banquet\\Actions\\Api\\CorsiRest',
       'metodo' => 'getInsert',
-    ),
-    '/utenti' => 
-    array (
-      'controller' => 'Banquet\\Actions\\Api\\UserController',
-      'metodo' => 'crea',
     ),
     '/login' => 
     array (

@@ -86,7 +86,7 @@
         <div>
           <h3>Genera l'API REST</h3>
           <pre><b>php banquet make:api Corsi </b></pre>
-          <p class="muted">Verranno create anche le route API.</p>
+          <p class="muted">Verranno generati i metodi con attributo #[Route] per ogni endpoint.</p>
         </div>
       </div>
     </div>
@@ -143,13 +143,13 @@ Il file OpenApiConfig.php (con le info globali: server, security, tag) viene cre
         <div>
           <h3>Esempio pratico</h3>
           <pre><b>php banquet make:api Corsi </b></pre>
-          <p class="muted">Questo comando crea il servizio Corsi. "CorsiRest" e la sua implementazione. 
-          oltre che alla struttura mvc, genera Entity, DAO, Model, Service e le route.   
+          <p class="muted">Questo comando crea il servizio Corsi, "CorsiRest" e la sua implementazione. 
+          Oltre alla struttura MVC, genera Entity, DAO, Model, Service e i metodi REST con attributo #[Route].   
           
         </p>
-           
-          <p class="muted">Le url prodotte sono raggiungibili sui seguenti endpoint generati: <br>
-           
+            
+          <p class="muted">Gli endpoint generati sono raggiungibili su: <br>
+            
             <code>GET /api/corsi</code>.<br>
             <code>GET /api/corsi/{id}</code>.<br>
             <code>POST /api/corsi</code>.<br>
@@ -157,13 +157,14 @@ Il file OpenApiConfig.php (con le info globali: server, security, tag) viene cre
             <code>DELETE /api/corsi/{id}</code>.
             </p>
       <p class="muted"><br>
-      <b><br>Le chiamate Rest includono il metodo del controller da richiamare (solo per le api rest)</b><br>
-      <h3>Route generate in (app/src/routes/web.php)</h3><br>
-      <code>$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');</code><br>
-      <code>$router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getById');</code><br>
-      <code>$router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getInsert');</code><br>
-      <code>$router->put('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getUpdate');</code><br>
-      <code>$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getDelete');</code>
+      <b><br>Le route vengono dichiarate tramite attributo #[Route] direttamente sui metodi della classe REST</b><br>
+      <h3>Esempio di attributi generati (CorsiRest.php)</h3><br>
+      <code>#[Route('/api/corsi', 'GET')]</code><br>
+      <code>#[Route('/api/corsi/{id}', 'GET')]</code><br>
+      <code>#[Route('/api/corsi', 'POST')]</code><br>
+      <code>#[Route('/api/corsi', 'PUT')]</code><br>
+      <code>#[Route('/api/corsi/{id}', 'DELETE')]</code><br>
+      Non è più necessario un file <code>web.php</code>: lo scanner riflessivo rileva automaticamente tutti gli attributi.
 
 
    </p>         
@@ -175,7 +176,7 @@ Il file OpenApiConfig.php (con le info globali: server, security, tag) viene cre
       <div class="step">
         <div class="step-number">5</div>
         <div>
-          <h3>Endpoint di autenticazione  (app/src/routes/web.php)</h3>
+          <h3>Endpoint di autenticazione</h3>
           <pre>
 - POST /api/login → genera il token JWT.
 - POST /api/logout → revoca il token (blacklist opzionale).
@@ -190,7 +191,7 @@ Il file OpenApiConfig.php (con le info globali: server, security, tag) viene cre
           <h3>Attenzione:</h3>
           <pre>
 Per l'integrità del sistema di autenticazione non rimuovere 
-le rotte `api/login` e `api/logout` da `app/src/routes/web.php`.
+gli attributi `#[Route]` per `api/login` e `api/logout`.
  </pre>
         </div>
       </div>

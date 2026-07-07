@@ -115,13 +115,38 @@ Il file `OpenApiConfig.php` (con le info globali: server, security, tag) viene c
 
 ## Routing
 
+Le route vengono dichiarate tramite l'attributo `#[Route]` direttamente sui metodi delle Action classi:
+
 ```php
-$router->get('/articoli/{slug}', \Banquet\Actions\Articolo::class);
-$router->get('/articoli/{id:\d+}', \Banquet\Actions\Articolo::class);
-$router->post('/articoli', \Banquet\Actions\Articolo::class)->middleware('auth');
-$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');
-$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getDelete');
+use Banquet\Ms\Core\Attribute\Route;
+
+class Corsi extends SenderAction {
+    #[Route('/corsi', 'GET')]
+    public function send() {
+        // ...
+    }
+}
+
+class CorsiRest extends SenderAction {
+    #[Route('/api/corsi', 'GET')]
+    public function getAll(): void { }
+
+    #[Route('/api/corsi/{id}', 'GET')]
+    public function getById($id = null): void { }
+
+    #[Route('/api/corsi', 'POST')]
+    public function getInsert(): void { }
+
+    #[Route('/api/corsi/{id}', 'DELETE')]
+    public function getDelete($id = null): void { }
+}
 ```
+
+Pattern supportati: `{id}`, `{id:\d+}`, `{slug}-{id}`.
+
+I parametri si leggono con `$this->route('id')`.
+
+Niente più file `web.php` da gestire: lo scanner riflessivo trova automaticamente tutte le classi Action nella directory `app/src/Actions/`.
 
 ## DI Container
 
@@ -183,7 +208,6 @@ banquet/
 │   │   ├── Dao/              # Data Access Object
 │   │   ├── Service/          # Business logic
 │   │   ├── Entity/           # Entity (una per tabella)
-│   │   ├── routes/web.php    # Route
 │   │   └── view/             # Template
 │   ├── brand/
 │   └── setting/
