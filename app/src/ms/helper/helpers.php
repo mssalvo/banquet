@@ -4,7 +4,7 @@
 function app()
 {
     if(!isset($GLOBALS['app'])) {
-      $GLOBALS['app'] = new \Banquet\Core\Container();
+      $GLOBALS['app'] = new \Banquet\Ms\Core\Container();
     }
     return $GLOBALS['app'];
 

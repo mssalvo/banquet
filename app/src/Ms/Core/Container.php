@@ -1,6 +1,8 @@
 <?php
 namespace Banquet\Ms\Core;
-
+use ReflectionClass;
+use ReflectionType;
+use ReflectionNamedType;
 class Container
 {
     protected $instances = [];
@@ -38,7 +40,7 @@ class Container
         }
 
         // reflection normale
-        $reflection = new \ReflectionClass($class);
+        $reflection = new ReflectionClass($class);
 
         $constructor = $reflection->getConstructor();
 
@@ -54,18 +56,25 @@ class Container
 
             $type = $param->getType();
 
-            if ($type && !$type->isBuiltin()) {
-                Log::writeInfo("Type name::".$type->getName());
-                $dependencies[] = $this->get($type->getName());
+            if ($type && method_exists($type, 'isBuiltin') && !$type->isBuiltin()) {
+                 
+                if ($type instanceof ReflectionNamedType && method_exists($type, 'getName')) {
+                    $typeName = $type->getName();
+                } else {
+                    
+                    $typeName = (string) $type;
+                }
+                Log::writeInfo("Type name::" . $typeName);
+                $dependencies[] = $this->get($typeName);
 
             } elseif ($param->isDefaultValueAvailable()) {
-                    $dependencies[] = $param->getDefaultValue();
-   
-               } else {
-                    throw new \Exception(
-                        "Impossibile risolvere '{$param->getName()}' in classe {$class}"
-                    );
-                }
+                $dependencies[] = $param->getDefaultValue();
+
+            } else {
+                throw new \Exception(
+                    "Impossibile risolvere '{$param->getName()}' in classe {$class}"
+                );
+            }
         }
 
         return $this->instances[$class] = $reflection->newInstanceArgs($dependencies);
