@@ -9,7 +9,8 @@
  */
 
 namespace Banquet\Actions\Footer;
-use \Banquet\Core\SenderAction;
+
+use Banquet\Ms\Core\SenderAction;
 
 class Footer extends SenderAction
 {

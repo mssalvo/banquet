@@ -85,14 +85,13 @@ php banquet make:action Corsi
 
 Questo genera:
 
-- Action
+- Action (con attributo `#[Route]`)
 - View
-- Route
 
 ### Nuove opzioni del generatore Action
 
-- `php banquet make:action Corsi --not-view` → genera solo la Action e la Route.
-- `php banquet make:action Corsi --not-route` → genera la Action e la View, senza Route.
+- `php banquet make:action Corsi --not-view` → genera solo la Action con la Route (attributo `#[Route]`).
+- `php banquet make:action Corsi --not-route` → genera la Action e la View, senza attributo Route.
 - `php banquet make:action Corsi --action-service=Corsi` → inietta il service `CorsiService` nel costruttore dell'Action.
 - `php banquet make:action ListaCorsi --with-api` → genera l'Action, la View, la Route e abilita l'API REST associata.
 
@@ -193,13 +192,20 @@ http://localhost:8000/home
 php banquet make:action Prodotti
 ```
 
-### Step 2: apri la rotta generata
+### Step 2: verifica la route generata
 
-Il generatore aggiunge una rotta del tipo:
+Il generatore aggiunge l'attributo `#[Route]` direttamente sul metodo `send()` della Action:
 
 ```php
-$router->get('/prodotti', \Banquet\Actions\Prodotti::class);
+use Banquet\Ms\Core\Attribute\Route;
+
+#[Route('/prodotti', 'GET')]
+public function send() {
+    // ...
+}
 ```
+
+La route viene rilevata automaticamente dallo scanner riflessivo, senza bisogno di file `web.php`.
 
 ### Step 3: apri la view generata
 
@@ -221,7 +227,26 @@ Per una tabella chiamata `iscrizione`:
 php banquet make:api Iscrizione
 ```
 
-Le route saranno disponibili come:
+Verranno generati i metodi con attributi `#[Route]`:
+
+```php
+#[Route('/api/iscrizione', 'GET')]
+public function getAll(): void { }
+
+#[Route('/api/iscrizione/{id}', 'GET')]
+public function getById($id = null): void { }
+
+#[Route('/api/iscrizione', 'POST')]
+public function getInsert(): void { }
+
+#[Route('/api/iscrizione', 'PUT')]
+public function getUpdate(): void { }
+
+#[Route('/api/iscrizione/{id}', 'DELETE')]
+public function getDelete($id = null): void { }
+```
+
+Endpoint disponibili:
 
 ```text
 GET/POST/PUT  /api/iscrizione

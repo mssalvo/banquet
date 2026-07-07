@@ -4,7 +4,7 @@
 function app()
 {
     if(!isset($GLOBALS['app'])) {
-      $GLOBALS['app'] = new \Banquet\Core\Container();
+      $GLOBALS['app'] = new \Banquet\Ms\Core\Container();
     }
     return $GLOBALS['app'];
 
@@ -65,6 +65,9 @@ function redirect($url)
     exit;
 }
 
+function call_user_class_method($callable, ...$params) {
+    return $callable(...$params);
+}
 
 function user()
 {

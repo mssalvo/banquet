@@ -1,5 +1,5 @@
 <?php
-namespace Banquet\Core;
+namespace Banquet\Ms\Core;
 
 final class Encryption {
 	private $key;

@@ -3,9 +3,9 @@
 
 require __DIR__ . '/vendor/autoload.php';
 
-use Banquet\Core\Console\Commands\MakeMapCommand;
-use Banquet\Core\Console\Commands\MakeApiCommand;
-use Banquet\Core\Console\Commands\MakeActionCommand; 
+use Banquet\Ms\Core\Console\Commands\MakeMapCommand;
+use Banquet\Ms\Core\Console\Commands\MakeApiCommand;
+use Banquet\Ms\Core\Console\Commands\MakeActionCommand; 
 
 // registra comandi
 $commands = [

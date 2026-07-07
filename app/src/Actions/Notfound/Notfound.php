@@ -6,15 +6,16 @@
  * @author Utente
  */
 namespace Banquet\Actions\Notfound;
-use \Banquet\Core\SenderAction;
+use Banquet\Ms\Core\Attribute\Route;
+use Banquet\Ms\Core\SenderAction;
 
 class Notfound extends SenderAction{
    	 
-
+        #[Route(FOLDER_HOME.'/notfound', 'GET')]
         public function send() {
             
         $this->setTemplateName("notfound/notfound"); 
-        $language=$this->load("message_".$this->getLangName().".php");
+        $language=$this->loadLanguage();
         $this->varAdd('lang', $language); 
         return $this->getTemplate("notfound");
         

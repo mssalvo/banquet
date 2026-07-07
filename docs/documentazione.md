@@ -70,7 +70,6 @@ banquet/
 │       ├── Dao/
 │       ├── Entity/
 │       ├── Driver/
-│       ├── routes/
 │       └── view/
 └── bin/
 │  
@@ -97,8 +96,8 @@ Esegue:
 
 ### Flusso
 
-1. `Action::getAction()` carica `app/src/routes/web.php`
-2. Il `Router` valuta l'URI e restituisce la classe Action
+1. `RouterClass` scandisce la directory `app/src/Actions/` e raccoglie tutti i metodi annotati con `#[Route]`
+2. Il router valuta l'URI e risolve la classe Action corrispondente
 3. `Factory::output()` risolve l'Action dal container
 4. L'Action esegue `send()`
 5. Il template viene renderizzato e inviato
@@ -143,8 +142,7 @@ php banquet generate --class-dao  # genera la classe astratta Dao / se si cancel
 
 ### Percorsi utili
 
-- Rotte: `app/src/routes/web.php`
-- Action: `app/src/Actions/`
+- Action (con le route dichiarate via attributo): `app/src/Actions/`
 - View: `app/src/view/pages/`
 - API REST: `app/src/Actions/Api/`
 
@@ -152,36 +150,44 @@ php banquet generate --class-dao  # genera la classe astratta Dao / se si cancel
 
 ## 3. Routing
 
-### `app/src/routes/web.php`
+### Attributo `#[Route]`
 
-Il router supporta i metodi HTTP **GET**, **POST**, **PUT**, **DELETE**.
+Le route vengono dichiarate tramite l'attributo PHP `#[Route]` direttamente sui metodi delle classi Action.  
+Il router supporta i metodi HTTP **GET**, **POST**, **PUT**, **DELETE**, **OPTIONS**, **HEAD**, **PATCH**.
 
-Esempio attuale:
-
-```php
-$router = new \Banquet\Core\Router();
-
-$router->get('/', \Banquet\Actions\Home::class);
-$router->get('/home', \Banquet\Actions\Home::class);
-$router->get('/doc/{tipo}/{id}', \Banquet\Actions\Doc::class);
-$router->get('/doc', \Banquet\Actions\Doc::class)->middleware('auth');;
-$router->get('/utente/{id}', \Banquet\Actions\Home::class)->middleware('auth');
-$router->get('/login', \Banquet\Actions\Login::class);
-$router->post('/login', \Banquet\Actions\Login::class);
-
-return $router;
-```
-- Route generate per le chiamate Rest includono anche il metodo del controller da richiamare (solo per le api rest)
+Il router `RouterClass` scandisce automaticamente la directory `app/src/Actions/` e raccoglie tutti i metodi annotati con `#[Route]`.
 
 ```php
- 
-$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');
-$router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getById');
-$router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getInsert');
-$router->put('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getUpdate');
-$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getDelete');
+use Banquet\Ms\Core\Attribute\Route;
 
+class Home extends SenderAction {
+    #[Route('/', 'GET')]
+    #[Route('/home', 'GET')]
+    public function send() { }
+}
 
+class Login extends SenderAction {
+    #[Route('/login', 'GET')]
+    #[Route('/login', 'POST')]
+    public function send() { }
+}
+
+class CorsiRest extends SenderAction {
+    #[Route('/api/corsi', 'GET')]
+    public function getAll(): void { }
+
+    #[Route('/api/corsi/{id}', 'GET')]
+    public function getById($id = null): void { }
+
+    #[Route('/api/corsi', 'POST')]
+    public function getInsert(): void { }
+
+    #[Route('/api/corsi', 'PUT')]
+    public function getUpdate(): void { }
+
+    #[Route('/api/corsi/{id}', 'DELETE')]
+    public function getDelete($id = null): void { }
+}
 ```
 
 ### Pattern supportati
@@ -201,6 +207,8 @@ $params = $this->route();
 ```
 
 I parametri sono salvati in `$_REQUEST['_route_params']`.
+
+> **Niente più file `web.php` da gestire.** Lo scanner riflessivo trova automaticamente tutte le classi Action, anche quelle annidate in sottocartelle.
 
 ---
 
@@ -297,21 +305,18 @@ I dati renderizzati diventano variabili come `$Header`, `$Menu`, `$Footer`, `$Ca
 
 ## 6. Middleware
 
-Il router supporta middleware con `->middleware('auth')` e `->middleware('guest')`.
-
-Esempi:
+Nel router basato su attributi `#[Route]` non è previsto un sistema di middleware dichiarativo.  
+La protezione delle route va gestita direttamente all'interno del metodo `send()` della Action, ad esempio:
 
 ```php
-$router->get('/rest/{id}/{code}', \Banquet\Actions\Rest::class)->middleware('auth');
-$router->get('/login', \Banquet\Actions\Login::class)->middleware('guest');
+public function send() {
+    if (!isset($_SESSION['user_id'])) {
+        $this->redirect('/login');
+        return;
+    }
+    // ...
+}
 ```
-
-Comportamento attuale:
-
-- `auth`: se `$_SESSION['user_id']` non esiste, reindirizza a `/login`
-- `guest`: se `$_SESSION['user_id']` esiste, reindirizza a `/`
-
-Puoi estendere `runMiddleware()` in `app/src/Core/Router.php` per altri middleware.
 
 ---
 
@@ -324,7 +329,7 @@ Banquet supporta l'autenticazione REST basata su token JWT e fornisce un fallbac
 - `POST /api/login` → genera il token JWT.
 - `POST /api/logout` → revoca il token (blacklist opzionale).
 
-> Attenzione: per l'integrità del sistema di autenticazione non rimuovere le rotte `api/login` e `api/logout` da `app/src/routes/web.php`.
+> Attenzione: per l'integrità del sistema di autenticazione non rimuovere gli attributi `#[Route]` per `api/login` e `api/logout`.
 
 ### Configurazione
 
@@ -483,6 +488,7 @@ namespace Banquet\Actions;
 
 use Banquet\Core\SenderAction;
 use Banquet\Service\CorsiService;
+use Banquet\Ms\Core\Attribute\Route;
 
 class Corsi extends SenderAction
 {
@@ -492,6 +498,7 @@ class Corsi extends SenderAction
         $this->service = $service;
     }
 
+    #[Route('/corsi', 'GET')]
     public function send() {
         $this->setTemplateName('pages/corsi');
         $this->varAdd('corsi', $this->service->getAllCorsi());
@@ -525,6 +532,7 @@ namespace Banquet\Actions\Api;
 
 use Banquet\Core\SenderAction;
 use Banquet\Service\CorsiService;
+use Banquet\Ms\Core\Attribute\Route;
 
 class CorsiRest extends SenderAction
 {
@@ -534,27 +542,37 @@ class CorsiRest extends SenderAction
         $this->service = $service;
     }
 
-    public function send() {
-        $this->setTemplateName('pages/json');
+    #[Route('/api/corsi', 'GET')]
+    public function getAll(): void {
+        // ...
+    }
 
-        if ($this->route('id') != null) {
-            $result = $this->service->getCorsiById($this->route('id'));
-        } else {
-            $result = $this->service->getAllCorsi();
-        }
+    #[Route('/api/corsi/{id}', 'GET')]
+    public function getById($id = null): void {
+        // ...
+    }
 
-        $this->varAdd('json', json_encode($result));
-        $this->getResponse()->addHeader('Content-Type: application/json');
+    #[Route('/api/corsi', 'POST')]
+    public function getInsert(): void {
+        // ...
+    }
 
-        return $this->getTemplate('empty');
+    #[Route('/api/corsi', 'PUT')]
+    public function getUpdate(): void {
+        // ...
+    }
+
+    #[Route('/api/corsi/{id}', 'DELETE')]
+    public function getDelete($id = null): void {
+        // ...
     }
 }
 ```
 
-### Rotte generate automaticamente
+### Route generate automaticamente
 
-- `make:action` aggiunge `GET /corsi` in `app/src/routes/web.php`
-- `make:api` aggiunge `GET/POST/PUT  /api/corsi` e `GET/DELETE  /api/corsi/{id}`
+- `make:action` aggiunge `#[Route('/corsi', 'GET')]` sul metodo `send()` della Action generata
+- `make:api` aggiunge i corrispondenti `#[Route]` per ogni endpoint CRUD sui metodi della classe REST generata
 
 ---
 
@@ -568,9 +586,12 @@ class CorsiRest extends SenderAction
 namespace Banquet\Actions;
 
 use Banquet\Core\SenderAction;
+use Banquet\Ms\Core\Attribute\Route;
 
 class Login extends SenderAction
 {
+    #[Route('/login', 'GET')]
+    #[Route('/login', 'POST')]
     public function send()
     {
         if ($this->getPost('username') && $this->getPost('password')) {
@@ -597,9 +618,11 @@ class Login extends SenderAction
 namespace Banquet\Actions;
 
 use Banquet\Core\SenderAction;
+use Banquet\Ms\Core\Attribute\Route;
 
 class Rest extends SenderAction
 {
+    #[Route('/rest/{id}/{slug}', 'GET')]
     public function send()
     {
         $id = $this->route('id');

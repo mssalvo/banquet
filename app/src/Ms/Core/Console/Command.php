@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Banquet\Core\Console;
+namespace Banquet\Ms\Core\Console;
 
 abstract class Command
 {

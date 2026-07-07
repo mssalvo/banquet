@@ -1,6 +1,6 @@
 <?php
 
-namespace Banquet\Core;
+namespace Banquet\Ms\Core;
 
 class EnvLoader
 {

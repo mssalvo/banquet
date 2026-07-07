@@ -6,7 +6,7 @@
  * @author Utente
  */
 namespace Banquet\Actions\Error;
-use \Banquet\Core\SenderAction;
+use Banquet\Ms\Core\SenderAction;
 
 class Error extends SenderAction{
    	 

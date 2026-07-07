@@ -7,7 +7,7 @@
  */
 
 namespace Banquet\Actions\Menu;
-use \Banquet\Core\SenderAction;
+use Banquet\Ms\Core\SenderAction;
 
 class Menu extends SenderAction{
 

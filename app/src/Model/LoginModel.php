@@ -4,7 +4,7 @@
 
 namespace Banquet\Model;
 
-class Login {
+class LoginModel {
    
     public function __construct() {
     

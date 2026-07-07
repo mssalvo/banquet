@@ -1,5 +1,5 @@
 <?php
-namespace Banquet\Core\Jwt;
+namespace Banquet\Ms\Core\Jwt;
 
 
 class JwtService

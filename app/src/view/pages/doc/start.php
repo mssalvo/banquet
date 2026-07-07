@@ -127,7 +127,7 @@
         <div>
           <h3>Genera una Action completa</h3>
           <pre>php banquet make:action corsi</pre>
-          <p class="muted">Questo genera Action, View e rotta.</p>
+          <p class="muted">Questo genera Action (con attributo #[Route]) e View.</p>
         </div>
       </div>
     </div>
@@ -138,7 +138,7 @@
         <div>
           <h3>Genera l'API REST</h3>
           <pre>php banquet make:api Corsi </pre>
-          <p class="muted">Verranno create anche le route API.</p>
+          <p class="muted">Verranno generati i metodi con attributo #[Route] per ogni endpoint.</p>
         </div>
       </div>
     </div>

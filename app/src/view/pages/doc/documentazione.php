@@ -176,7 +176,6 @@
 │       ├── Dao/
 │       ├── Entity/
 │       ├── Driver/
-│       ├── routes/
 │       └── view/
 └── bin/
      </pre>
@@ -186,7 +185,7 @@
       <h2>2. Entry point e flusso di richiesta</h2>
       <p>Il front controller è <code>index.php</code>. Esegue il caricamento di Composer, crea il container, imposta la response e invoca <code>Factory::output(Action::getAction())</code>.</p>
       <ol>
-        <li><code>Action::getAction()</code> carica il file delle route.</li>
+        <li><code>RouterClass</code> scandisce <code>app/src/Actions/</code> e raccoglie i metodi annotati con <code>#[Route]</code>.</li>
         <li>Il router valuta l'URI e restituisce la classe Action.</li>
         <li><code>Factory::output()</code> risolve l'Action dal container.</li>
         <li>L'Action esegue <code>send()</code>.</li>
@@ -206,24 +205,36 @@ php banquet --help
     <section id="routing">
       <h2>3. Routing</h2>
       <p>Il router supporta GET, POST, PUT, DELETE e usa pattern come <code>{id}</code>, <code>{id:\d+}</code> e <code>{slug}-{id}</code>.</p>
-      <pre>$router = new \Banquet\Core\Router();
+      <pre>use Banquet\Ms\Core\Attribute\Route;
 
-$router->get('/', \Banquet\Actions\Home::class);
-$router->get('/home', \Banquet\Actions\Home::class);
-$router->get('/doc/{tipo}/{id}', \Banquet\Actions\Doc::class);
-$router->get('/login', \Banquet\Actions\Login::class);
-$router->post('/login', \Banquet\Actions\Login::class);
+class Home extends SenderAction {
+    #[Route('/', 'GET')]
+    #[Route('/home', 'GET')]
+    public function send() { }
+}
 
-<b>#Le chiamate Rest includono il metodo da richiamare (solo per le api rest)</b>
+class Login extends SenderAction {
+    #[Route('/login', 'GET')]
+    #[Route('/login', 'POST')]
+    public function send() { }
+}
 
-$router->get('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getAll');
-$router->get('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getById');
-$router->post('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getInsert');
-$router->put('/api/corsi', \Banquet\Actions\Api\CorsiRest::class)->rest('getUpdate');
-$router->delete('/api/corsi/{id}', \Banquet\Actions\Api\CorsiRest::class)->rest('getDelete');
+class CorsiRest extends SenderAction {
+    #[Route('/api/corsi', 'GET')]
+    public function getAll(): void { }
 
+    #[Route('/api/corsi/{id}', 'GET')]
+    public function getById($id = null): void { }
 
-return $router;</pre>
+    #[Route('/api/corsi', 'POST')]
+    public function getInsert(): void { }
+
+    #[Route('/api/corsi', 'PUT')]
+    public function getUpdate(): void { }
+
+    #[Route('/api/corsi/{id}', 'DELETE')]
+    public function getDelete($id = null): void { }
+}</pre>
     </section>
 
     <section id="actions">
@@ -273,10 +284,14 @@ class MiaAction extends SenderAction
 
     <section id="middleware">
       <h2>6. Middleware</h2>
-      <p>Il router supporta middleware come <code>auth</code> e <code>guest</code>.</p>
-      <pre>$router->get('/rest/{id}/{code}', \Banquet\Actions\Rest::class)->middleware('auth');
-$router->get('/login', \Banquet\Actions\Login::class)->middleware('guest');</pre>
-      <p class="muted">Il comportamento attuale reindirizza a /login o / in base al contesto di sessione.</p>
+      <p>Nel router basato su attributi <code>#[Route]</code> la protezione va gestita direttamente nei metodi Action.</p>
+      <pre>public function send() {
+    if (!isset($_SESSION['user_id'])) {
+        $this->redirect('/login');
+        return;
+    }
+    // ...
+}</pre>
     </section>
 
     <section id="generator">

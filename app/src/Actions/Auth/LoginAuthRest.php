@@ -9,8 +9,9 @@
 
 namespace Banquet\Actions\Auth;
 
-use Banquet\Core\SenderAction;
-use Banquet\Core\Jwt\JwtService;
+use Banquet\Ms\Core\Attribute\Route;
+use Banquet\Ms\Core\SenderAction;
+use Banquet\Ms\Core\Jwt\JwtService;
 
 class LoginAuthRest extends SenderAction
 {
@@ -18,6 +19,7 @@ class LoginAuthRest extends SenderAction
     public function __construct() {
       
     }
+    #[Route(FOLDER_HOME.'/api/login', 'GET')]
     public function send()
     {
         $this->setTemplateName("pages/json");

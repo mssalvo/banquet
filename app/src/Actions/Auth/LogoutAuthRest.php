@@ -9,7 +9,8 @@
 
 namespace Banquet\Actions\Auth;
 
-use Banquet\Core\SenderAction;
+use Banquet\Ms\Core\Attribute\Route;
+use Banquet\Ms\Core\SenderAction;
 
 class LogoutAuthRest extends SenderAction
 {
@@ -17,6 +18,7 @@ class LogoutAuthRest extends SenderAction
     public function __construct() {
       
     }
+    #[Route(FOLDER_HOME.'/api/logout', 'GET')]
     public function send()
     {
         $this->setTemplateName("pages/json");

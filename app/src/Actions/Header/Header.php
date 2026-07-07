@@ -6,7 +6,8 @@
  * @author Utente
  */
 namespace Banquet\Actions\Header;
-use \Banquet\Core\SenderAction;
+
+use Banquet\Ms\Core\SenderAction;
 
 class Header extends SenderAction{
     public function send() {

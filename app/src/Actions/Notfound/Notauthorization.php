@@ -6,15 +6,16 @@
  * @author Utente
  */
 namespace Banquet\Actions\Notfound;
-use \Banquet\Core\SenderAction;
+use Banquet\Ms\Core\Attribute\Route;
+use Banquet\Ms\Core\SenderAction;
 
 class Notauthorization extends SenderAction{
    	 
-
+     #[Route(FOLDER_HOME.'/notauthorization', 'GET')]
         public function send() {
             
         $this->setTemplateName("notfound/notauthorization"); 
-        $language=$this->load("message_".$this->getLangName().".php");
+        $language=$this->loadLanguage();
         $this->varAdd('lang', $language); 
         return $this->getTemplate("notfound");
         
