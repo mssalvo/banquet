@@ -3,7 +3,7 @@
 Banquet è uno strumento PHP che accelera lo sviluppo generando automaticamente il layer applicativo (Entity, DAO, Model, Service, API e Route) a partire dal database.<br>
 
 - **Namespace root**: `Banquet\` (PSR-4 → `app/src/`)
-- **PHP**: >= 7.4
+- **PHP**: >= 8.0
 - **Autoload**: Composer
 - **Pattern**: Front Controller, DI Container, Router con parametri, Action/Service/DAO/Entity generator
 
