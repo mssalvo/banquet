@@ -48,7 +48,8 @@ namespace Banquet\Actions\Api;
 use Banquet\Ms\Core\SenderAction;
 
 class YourApi extends SenderAction {
- 
+  
+  #[Route('/path', 'GET')]
   public function send() {
 
     $response = ['data' => 'your data'];
@@ -76,6 +77,7 @@ class Corsi extends SenderAction{
         $this->service=$service;
     }
 
+    #[Route('/corsi', 'GET')]
     public function send() {
          $this->setTemplateName("pages/corsi");
 
