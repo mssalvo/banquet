@@ -1,5 +1,5 @@
 <?php
-// Router.php
+ 
 namespace Banquet\Ms\Core;
 
 use Banquet\Actions\Notfound\Notfound;
@@ -92,7 +92,7 @@ class RouterClass {private string $cacheFile;
     
        
         if (preg_match($regex, $url, $matches)) {
-                // Rimuoviamo il primo elemento (che è l'intero URI matchato)
+                // Rimuovo il primo elemento
                 array_shift($matches); 
 
                // Parametri nominati
@@ -100,7 +100,7 @@ class RouterClass {private string $cacheFile;
                 foreach ($paramNames as $index => $name) {
                     $params[$name] = $matches[$index] ?? null;
                 }
-                // Salva parametri globali
+                // Salvo parametri globali
                 $_REQUEST['_route_params'] = $params;
 
          
@@ -120,9 +120,8 @@ class RouterClass {private string $cacheFile;
         return Factory::execute($arrayObj);
            
     }
-      // Funzione helper di supporto (se non inclusa altrove) per invocare dinamicamente il metodo
-   
-    // (Inserire qui la funzione 'estraiClasseDaFile' vista nella risposta precedente)
+    
+    
     private function estraiClasseDaFile(string $filePath): ?string { 
     $contenuto = file_get_contents($filePath);
     $tokens = token_get_all($contenuto);

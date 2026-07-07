@@ -45,7 +45,7 @@ Banquet streamlines development through automatic generation of the application 
     <div class="code-block">
       <pre><code>// In app/src/Actions/Api/YourApi.php
 namespace Banquet\Actions\Api;
-use Banquet\Core\SenderAction;
+use Banquet\Ms\Core\SenderAction;
 
 class YourApi extends SenderAction {
  
@@ -66,7 +66,7 @@ class YourApi extends SenderAction {
     <h4>Using Services & DAOs</h4>
     <div class="code-block">
       <pre><code>// Services layer for business logic
-use Banquet\Core\SenderAction;
+use Banquet\Ms\Core\SenderAction;
 use Banquet\Service\CorsiService;
 
 class Corsi extends SenderAction{
@@ -93,11 +93,13 @@ class Corsi extends SenderAction{
   <div class="api-example">
     <h4>Router Configuration</h4>
     <div class="code-block">
-      <pre><code>// In app/src/routes/web.php
-$router = new Router();
-$router->add('/api/courses', 'CorsiRest');
-$router->add('/courses', 'Corsi');
-$router->dispatch();</code></pre>
+      <pre><code> 
+class Home extends SenderAction {
+   
+    #[Route('/', 'GET')]
+    #[Route('/home', 'GET')]
+    public function send() { }
+}</code></pre>
     </div>
   </div>
 </div>

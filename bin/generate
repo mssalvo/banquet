@@ -1156,58 +1156,7 @@ PHP;
 // ──────────────────────────────────────────────────────────────────────────────
 
 function addApiRoutes(string $className): bool
-{  /*
-    global $ROUTES_FILE;
-    $routeName = strtolower(lcfirst($className));
-    $apiClass  = '\\Banquet\\Actions\\Api\\' . $className . 'Rest::class';
-
-    $routeAll  = "\$router->get(FOLDER_HOME.'/api/{$routeName}', {$apiClass})->rest('getAll');";
-    $routeById = "\$router->get(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass})->rest('getById');";
-    $routePost  = "\$router->post(FOLDER_HOME.'/api/{$routeName}', {$apiClass})->rest('getInsert');";
-    $routePut  = "\$router->put(FOLDER_HOME.'/api/{$routeName}', {$apiClass})->rest('getUpdate');";
-    $routeDelete  = "\$router->delete(FOLDER_HOME.'/api/{$routeName}/{id}', {$apiClass})->rest('getDelete');";
-
-    if (!file_exists($ROUTES_FILE)) {
-        echo "  ✗ File routes non trovato: {$ROUTES_FILE}\n";
-        return false;
-    }
-
-    $content = file_get_contents($ROUTES_FILE);
-
-    if (strpos($content, $routeAll) !== false) {
-        echo "  ∼ Route Api già presente in web.php\n";
-        return true;
-    }
-    if (strpos($content, $routePost) !== false) {
-        echo "  ∼ Route Api post già presente in web.php\n";
-        return true;
-    }
-    if (strpos($content, $routePut) !== false) {
-        echo "  ∼ Route Api put già presente in web.php\n";
-        return true;
-    }
-    if (strpos($content, $routeDelete) !== false) {
-        echo "  ∼ Route Api delete già presente in web.php\n";
-        return true;
-    }
-
-    $newRoutes = "\n{$routeAll}\n{$routeById}\n{$routePost}\n{$routePut}\n{$routeDelete}\n";
-
-    $newContent = str_replace(
-        "return \$router;",
-        $newRoutes . "return \$router;",
-        $content
-    );
-
-    if ($newContent === $content) {
-        echo "  ✗ Impossibile trovare 'return \$router;' in web.php\n";
-        return false;
-    }
-
-    file_put_contents($ROUTES_FILE, $newContent);
-    echo "  ✓ Route Api aggiunte in web.php\n";
-    echo  $newRoutes;
-    */
+{   
     return true;
 }
 
@@ -1216,39 +1165,7 @@ function addApiRoutes(string $className): bool
 // ──────────────────────────────────────────────────────────────────────────────
 
 function addRouteEntry(string $className): bool
-{   /*
-    global $ROUTES_FILE;
-    $routeName = strtolower(lcfirst($className));
-    $actionFqcn = '\\Banquet\\Actions\\' . $className . '::class';
-    $routeLine = "\$router->get(FOLDER_HOME.'/{$routeName}', \\Banquet\\Actions\\{$className}::class);";
-
-    if (!file_exists($ROUTES_FILE)) {
-        echo "  ✗ File routes non trovato: {$ROUTES_FILE}\n";
-        return false;
-    }
-
-    $content = file_get_contents($ROUTES_FILE);
-
-    // Check if route already exists
-    if (strpos($content, $routeLine) !== false) {
-        echo "  ∼ Rotta già presente in web.php\n";
-        return true;
-    }
-
-    // Insert before "return $router;"
-    $newContent = str_replace(
-        "return \$router;",
-        $routeLine . "\n\nreturn \$router;",
-        $content
-    );
-
-    if ($newContent === $content) {
-        echo "  ✗ Impossibile trovare 'return \$router;' in web.php\n";
-        return false;
-    }
-
-    file_put_contents($ROUTES_FILE, $newContent);
-    */
+{    
     return true;
 }
 
