@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/PHP-%3E%3D%207.4-777BB4?style=flat-square&logo=php">
+    <img src="https://img.shields.io/badge/PHP-%3E%3D%208.0-777BB4?style=flat-square&logo=php">
   <img src="https://img.shields.io/packagist/v/mssalvo/banquet">
 <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square">
 </p>
