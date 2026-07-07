@@ -216,7 +216,7 @@ banquet/
 
 ## Requisiti
 
-- PHP >= 7.4
+- PHP >= 8.0
 - Composer
 - PDO extension per il driver scelto
 
