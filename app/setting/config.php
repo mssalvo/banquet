@@ -4,6 +4,7 @@ define('DIR_APP', dirname(__DIR__));
 
 //FOLDER_HOME IL NOME DELLA CARTELLA DI BASE DELL'APPLICAZIONE, 
 //INSERISCI DOPPI APICI ('') SE SI TROVA NELLA DIRECTORY PRINCIPALE. 
+
 define('FOLDER_HOME', '');
 
 // HTTP
@@ -22,26 +23,14 @@ define('DIR_TEMPLATE_MASTER', DIR_APP.'/src/view/master/');
 define('DIR_LOAD', DIR_APP.'/src/view/language/');
 
 //ms core
-define('DIR_SYSTEM', DIR_APP.'/src/ms/');
-define('DIR_ACTION_NAME', DIR_APP.'/setting/prop/');
-define('DIR_DATABASE', DIR_APP.'/src/ms/driver/'); 
+define('DIR_ACTION_NAME', DIR_APP.'/setting/prop/'); 
 
-//base folder name
-define('BASE_SEPARATOR', '/');
-define('BASE_ACTION', 'actions');
-define('BASE_MODEL', 'model');
-define('BASE_VIEW', 'view');
-define('BASE_PAGES', 'pages');
-define('BASE_LANGUAGE', 'language');
-define('BASE_BRAND', 'brand');
 //extention file
-define('PHP_EXT', '.php');
 define('TEMPLATE_EXT', '.php');
 //language
 define('KEY_LANG', 'mslanguage');
 define('LANG_DEFAULT', 'it');
 //page 
-define('ACTION_PAGE_INIT', 'home'); 
 define('ACTION_PAGE_404', 'notfound/notfound'); 
 
 define('LOG_DIR_NAME', dirname(DIR_APP).'/');

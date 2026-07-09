@@ -36,10 +36,10 @@
     },
     "files": [
       "app/setting/config.php",
-      "app/src/ms/config-cors.php",
-      "app/src/ms/helper/helpers.php",
+      "app/src/Ms/config-cors.php",
+      "app/src/Ms/helper/helpers.php",
       "app/setting/startup.php",
-      "app/src/ms/util/htmlreport.php"
+      "app/src/Ms/util/htmlreport.php"
     ]
   },
   "require": {
