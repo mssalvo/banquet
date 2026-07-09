@@ -102,7 +102,7 @@ class RouterClass {private string $cacheFile;
                 }
                 // Salvo parametri globali
                 $_REQUEST['_route_params'] = $params;
-                $_REQUEST['_action_route'] = explode('/', $url)[1];
+                $_REQUEST['_action_route'] = $url;
          
                 $arrayObj=[];
                 $arrayObj['action']=$info['controller'];
