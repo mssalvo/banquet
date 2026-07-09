@@ -71,7 +71,7 @@ abstract class SenderAction extends BaseAction {
 
     public function actionRoute()
     {
-        $actionName = $_REQUEST['_action_route'] ?? '';
+        $actionName = $_REQUEST['_action_route'] ?? '/';
         if (FOLDER_HOME!=='') {
         $actionName= str_replace(FOLDER_HOME, '', $actionName);
         }
