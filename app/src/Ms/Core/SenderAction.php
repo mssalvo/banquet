@@ -69,6 +69,12 @@ abstract class SenderAction extends BaseAction {
         return $params[$key] ?? null;
     }
 
+    public function actionRoute()
+    {
+        $actionName = $_REQUEST['_action_route'] ?? '';
+        return $actionName;
+    }
+
     public function getParameter($param) {
        if(isset($_REQUEST[$param])){
         return $_REQUEST[$param];   

@@ -83,7 +83,7 @@ class RouterClass {private string $cacheFile;
          $url = parse_url($path, PHP_URL_PATH);
          
 
-        // Cicliamo le regex registrate in cache per questo metodo HTTP
+        // Ciclo i path registrati in cache per questo metodo HTTP
         
         foreach ($this->rotte[$metodo] as $pathRoot => $info) {
             
@@ -102,7 +102,7 @@ class RouterClass {private string $cacheFile;
                 }
                 // Salvo parametri globali
                 $_REQUEST['_route_params'] = $params;
-
+                $_REQUEST['_action_route'] = explode('/', $url)[1];
          
                 $arrayObj=[];
                 $arrayObj['action']=$info['controller'];
