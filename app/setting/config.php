@@ -7,13 +7,6 @@ define('DIR_APP', dirname(__DIR__));
 
 define('FOLDER_HOME', '');
 
-// HTTP
-define('HTTP_SERVER', 'http://localhost:8000/');
-
-// HTTPS
-define('HTTPS_SERVER', 'https://localhost:8000/');
-
-define('HTTP_SRC', 'http://localhost:8000/');
 define('BRAND', 'http://localhost:8000/app/brand/'); 
 
 // DIR applicazione
@@ -37,8 +30,6 @@ define('LOG_DIR_NAME', dirname(DIR_APP).'/');
 define('LOG_FILE_NAME', 'log.txt'); 
 define('IS_LOG', 'ALL'); //ERROR - INFO - ALL
 define('LOG_MAX_SIZE',1048576); // 1 MB
-define('ACTION_NAME_TEXT', 'action');
-define('ACTION_DEF', 'home');
 
 
 ?>
