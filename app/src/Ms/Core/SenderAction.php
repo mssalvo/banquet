@@ -79,24 +79,16 @@ abstract class SenderAction extends BaseAction {
         return $action;
     }
 
-	public function security_click(int $numMax = 4) {
-
+	public function security_click() {
 
     $tempo_limite = 15 * 60; // 15 minuti in secondi (900)
 
-    
     if (!isset($_SESSION['_secutity_message']) || (time() - $_SESSION['_secutity_message']['_time']) > $tempo_limite) {
         $_SESSION['_secutity_message'] = [];
         $_SESSION['_secutity_message']['_count'] = 1;
         $_SESSION['_secutity_message']['_time'] = time();
     } else {
-        
         $_SESSION['_secutity_message']['_count']++;
-    }
-    if($_SESSION['_secutity_message']['_count']>$numMax){
-      $this->setTemplateName('info/security-click');
-      $this->varAdd('soglia_massima', $numMax);
-      return $this->getTemplate('empty');
     }
     return $_SESSION['_secutity_message']['_count'];
     }
