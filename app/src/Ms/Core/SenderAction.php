@@ -96,7 +96,10 @@ abstract class SenderAction extends BaseAction {
         $this->redirect(FOLDER_HOME.'/limit', 'refresh');
         exit;  
     }
-	
+
+    return $_SESSION['_secutity_message']['_count'];
+ }
+
     public function getParameter($param) {
        if(isset($_REQUEST[$param])){
         return $_REQUEST[$param];   
