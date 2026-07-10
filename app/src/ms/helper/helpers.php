@@ -45,6 +45,24 @@ function csrf_token()
     return $_SESSION['_csrf'];
 }
 
+function security_getClick()
+{
+
+    $tempo_limite = 15 * 60; // 15 minuti in secondi (900)
+
+    
+    if (!isset($_SESSION['_secutity_message']) || (time() - $_SESSION['_secutity_message']['_time']) > $tempo_limite) {
+        $_SESSION['_secutity_message'] = [];
+        $_SESSION['_secutity_message']['_count'] = 1;
+        $_SESSION['_secutity_message']['_time'] = time();
+    } else {
+        
+        $_SESSION['_secutity_message']['_count']++;
+    }
+
+    return $_SESSION['_secutity_message']['_count'];
+}
+
 function validate($data, $rules)
 {
     $errors = [];
