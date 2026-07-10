@@ -79,7 +79,7 @@ abstract class SenderAction extends BaseAction {
         return $action;
     }
 
-	public function security_click() {
+ public function security_click(int $numMax = 4) {
 
     $tempo_limite = 15 * 60; // 15 minuti in secondi (900)
 
@@ -87,10 +87,14 @@ abstract class SenderAction extends BaseAction {
         $_SESSION['_secutity_message'] = [];
         $_SESSION['_secutity_message']['_count'] = 1;
         $_SESSION['_secutity_message']['_time'] = time();
+        $_SESSION['_secutity_message']['_max']= $numMax;
     } else {
         $_SESSION['_secutity_message']['_count']++;
     }
-    return $_SESSION['_secutity_message']['_count'];
+    if ($_SESSION['_secutity_message']['_count'] > $numMax) {
+        
+        $this->redirect(FOLDER_HOME.'/limit', 'refresh');
+        exit;  
     }
 	
     public function getParameter($param) {
