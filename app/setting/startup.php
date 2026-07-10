@@ -1,8 +1,15 @@
 <?php
 // Error Reporting
-
-
+// Monitora tutti gli errori possibili
 error_reporting(E_ALL);
+ini_set('display_errors', 0); 	   // 1 Mostra gli errori a schermo / 0 NON mostra gli errori a schermo
+ini_set('log_errors', 1);		   // Scrive l'errore su log	
+ini_set('error_log', LOG_DIR_NAME . '/errori_progetto.log');  // Setta il path del file di log
+
+/*
+ini_set('display_errors', 0);     // NON mostra gli errori a schermo
+ini_set('log_errors', 1);         // Salva gli errori in un file di log
+*/
 
 // Check Version
 if (version_compare(phpversion(), '8.0.0', '<') == true) {
