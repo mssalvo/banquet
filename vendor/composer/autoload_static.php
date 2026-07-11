@@ -7,11 +7,11 @@ namespace Composer\Autoload;
 class ComposerStaticInita783902f3d62be675813e26689876209
 {
     public static $files = array (
-        'db6c572584d1b657acdbdc7b50d5b494' => __DIR__ . '/../..' . '/app/setting/config.php',
-        'ba009d89af20eccfa07132c42c34aceb' => __DIR__ . '/../..' . '/app/src/ms/helper/helpers.php',
-        '3bd02a56768b8f73fb7d0097f4fb01bb' => __DIR__ . '/../..' . '/app/src/ms/ms-config.php',
-        '0b7c06d896f087a6183380cfd5372001' => __DIR__ . '/../..' . '/app/setting/startup.php',
-        '796a7351b9a0b178fe260c0ac32368c0' => __DIR__ . '/../..' . '/app/src/ms/util/htmlreport.php',
+        'dad3497bbf29c3ae9cb6877b3b6b2566' => __DIR__ . '/../..' . '/app/setting/config.php',
+        'eb456b5581435be7ade64a828d47f500' => __DIR__ . '/../..' . '/app/src/Ms/config-cors.php',
+        '6f048b14ea7691f7c4c5e9e7d4e9fbf7' => __DIR__ . '/../..' . '/app/src/Ms/helper/helpers.php',
+        'b7384b5200e13fdebf9e8d400a9a5a2b' => __DIR__ . '/../..' . '/app/setting/startup.php',
+        '06eca1ae10bbfdb600eb99cb41f13765' => __DIR__ . '/../..' . '/app/src/Ms/util/htmlreport.php',
     );
 
     public static $prefixLengthsPsr4 = array (
