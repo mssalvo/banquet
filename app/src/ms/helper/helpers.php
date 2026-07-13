@@ -115,6 +115,35 @@ function generateUrl($pattern, $params)
     }
     return $pattern;
 }
+
+function getUserData(): array {
+        $ip = '0.0.0.0';
+
+         
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            
+            $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $ip = trim($ipList[0]);
+        } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+
+         
+        if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
+            $ip = '0.0.0.0';
+        }
+
+        
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+
+        return [
+            'ip' => $ip,
+            'user_agent' => htmlspecialchars($userAgent, ENT_QUOTES, 'UTF-8')
+        ];
+    }
+
 /*
 echo generateUrl('/corso/{slug}-{id}', [
     'slug' => 'calcio-base',
